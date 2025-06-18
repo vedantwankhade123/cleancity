@@ -15,50 +15,61 @@ A full-stack web application for citizens to report waste management issues and 
 
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Express.js + TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: PostgreSQL with Drizzle ORM (Neon)
 - **Authentication**: Session-based with Passport.js
 - **UI Components**: Radix UI + Shadcn/ui
 - **State Management**: TanStack Query (React Query)
 - **Routing**: Wouter
 
-## Quick Deploy to Railway
+## 🚀 Quick Deploy to Vercel + Neon (Free Forever)
 
 ### Prerequisites
 - GitHub account
-- Railway account (free tier available)
+- Vercel account (free tier available)
+- Neon database (you already have this!)
 
 ### Step 1: Prepare Your Repository
 1. Push your code to GitHub
 2. Ensure all files are committed including the deployment configs
 
-### Step 2: Deploy to Railway
-1. Go to [Railway.app](https://railway.app)
-2. Click "New Project" → "Deploy from GitHub repo"
-3. Select your CleanCity repository
-4. Railway will automatically detect it's a Node.js app
+### Step 2: Deploy to Vercel
+1. Go to [Vercel.com](https://vercel.com)
+2. Click "New Project"
+3. Import your GitHub repository: `vedantwankhade123/Cleancity`
+4. Vercel will automatically detect it's a Node.js app
 
-### Step 3: Set Up Database
-1. In your Railway project, click "New" → "Database" → "PostgreSQL"
-2. Railway will automatically add the `DATABASE_URL` environment variable
+### Step 3: Configure Project Settings
+1. **Framework Preset**: `Node.js`
+2. **Root Directory**: `./` (leave as default)
+3. **Build Command**: `npm run vercel-build`
+4. **Output Directory**: `dist/public`
+5. **Install Command**: `npm ci`
 
 ### Step 4: Configure Environment Variables
-In your Railway project settings, add these environment variables:
+In your Vercel project settings, add these environment variables:
 
 ```
-DATABASE_URL=postgresql://... (automatically set by Railway)
-SESSION_SECRET=your-super-secret-session-key-here
+DATABASE_URL=postgresql://neondb_owner:npg_28VOqPHoywrb@ep-autumn-butterfly-a8n2dcbp-pooler.eastus2.azure.neon.tech/neondb?sslmode=require
+SESSION_SECRET=wastewise_secure_session_key_2024_xyz123
 NODE_ENV=production
 ```
 
 ### Step 5: Deploy
-1. Railway will automatically build and deploy your app
-2. Your app will be available at the provided Railway URL
+1. Click "Deploy"
+2. Vercel will automatically build and deploy your app
+3. Your app will be available at the provided Vercel URL
+
+### Step 6: Run Database Migration
+1. Go to your Vercel project dashboard
+2. Click "Functions" tab
+3. Find your server function and click "View Function Logs"
+4. The database migration will run automatically during build
 
 ## Local Development
 
 ### Prerequisites
 - Node.js 20+
-- PostgreSQL database
+- Neon database (you already have this!)
 - npm or yarn
 
 ### Setup
@@ -72,6 +83,7 @@ NODE_ENV=production
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm start` - Start production server
+- `npm run vercel-build` - Build for Vercel deployment
 - `npm run db:push` - Push database schema
 - `npm run db:init` - Initialize database
 
@@ -79,7 +91,7 @@ NODE_ENV=production
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `DATABASE_URL` | PostgreSQL connection string (Neon) | Yes |
 | `SESSION_SECRET` | Secret key for session encryption | Yes |
 | `NODE_ENV` | Environment (development/production) | No |
 
@@ -109,27 +121,31 @@ The app uses PostgreSQL with the following main tables:
 
 ## Deployment Options
 
-### Railway (Recommended)
-- Free tier available
-- Built-in PostgreSQL support
-- Automatic deployments from GitHub
-- Easy environment variable management
+### Vercel + Neon (Recommended - Free Forever)
+- ✅ Vercel: Free hosting with excellent performance
+- ✅ Neon: Free PostgreSQL database (you already have this!)
+- ✅ Automatic deployments from GitHub
+- ✅ Custom domains with SSL
+- ✅ Serverless functions
+- ✅ Global CDN
 
-### Render
-- Free tier available
-- PostgreSQL add-on support
-- Automatic deployments
+### Render (Alternative)
+- ✅ Free tier: 750 hours/month
+- ✅ Built-in PostgreSQL support
+- ✅ Automatic deployments from GitHub
+- ✅ Custom domains with SSL
 
-### Vercel + Railway
-- Deploy frontend on Vercel
-- Deploy backend on Railway
-- Good for high-traffic applications
+### Netlify + Supabase
+- ✅ Netlify: Free hosting for frontend
+- ✅ Supabase: Free PostgreSQL database
+- ✅ Easy deployment from GitHub
 
-### Heroku
-- Traditional option
-- Requires credit card for PostgreSQL
-- Good for established applications
+### Fly.io
+- ✅ Free tier: 3 shared-cpu VMs
+- ✅ PostgreSQL: Free tier available
+- ✅ Global deployment
+- ✅ No time limits
 
 ## Support
 
-For deployment issues or questions, please check the Railway documentation or create an issue in the repository.
+For deployment issues or questions, please check the Vercel documentation or create an issue in the repository.
