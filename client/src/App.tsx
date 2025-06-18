@@ -1,8 +1,10 @@
-import { Switch, Route } from "wouter";
-import { Suspense, lazy, useEffect } from "react";
+import { Switch, Route, useRoute } from "wouter";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import Landing from "@/pages/landing";
 import NotFound from "@/pages/not-found";
+import Navbar from "@/components/layout/navbar";
+import AuthModal from "@/components/dialogs/auth-modal";
 
 // Lazy load components for better performance
 const UserDashboard = lazy(() => import("@/pages/user/dashboard"));
@@ -59,6 +61,10 @@ function ProtectedRoute({
 
 function Router() {
   const { fetchUser } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [authType, setAuthType] = useState<"user" | "admin">("user");
+  const [isAdminRoute] = useRoute("/admin/:any*");
 
   useEffect(() => {
     fetchUser();
@@ -66,9 +72,25 @@ function Router() {
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
+      <div className={isAdminRoute ? 'hidden' : ''}>
+        <Navbar 
+          setShowLoginModal={setShowLoginModal}
+          setShowSignupModal={setShowSignupModal}
+          setAuthType={setAuthType}
+        />
+      </div>
+      
       <Switch>
-        {/* Public routes */}
-        <Route path="/" component={Landing} />
+        <Route 
+          path="/"
+          component={() => (
+            <Landing 
+              setShowLoginModal={setShowLoginModal}
+              setShowSignupModal={setShowSignupModal}
+              setAuthType={setAuthType}
+            />
+          )}
+        />
 
         {/* User routes */}
         <Route 
@@ -113,6 +135,31 @@ function Router() {
         {/* Fallback to 404 */}
         <Route component={NotFound} />
       </Switch>
+
+      {/* Auth Modals - Render outside Switch */}
+      <AuthModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        type="login"
+        userType={authType}
+        onSwitchType={(type) => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+          setAuthType(type);
+        }}
+      />
+
+      <AuthModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        type="signup"
+        userType={authType}
+        onSwitchType={(type) => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+          setAuthType(type);
+        }}
+      />
     </Suspense>
   );
 }

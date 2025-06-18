@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail } from "luc
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6">
+    <footer className="bg-gray-900 text-white pt-12 pb-6 rounded-[40px] overflow-hidden m-2.5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -127,15 +127,15 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-gray-400">
               <li className="flex items-start space-x-2">
                 <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>123 Clean Street, Green City, 56789</span>
+                <span>Amravati, Maharashtra, India</span>
               </li>
               <li className="flex items-start space-x-2">
                 <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>+1 (123) 456-7890</span>
+                <span>+91 9175988560</span>
               </li>
               <li className="flex items-start space-x-2">
                 <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>contact@cleancity.com</span>
+                <span>vedantwankhade47@gmail.com</span>
               </li>
             </ul>
           </div>

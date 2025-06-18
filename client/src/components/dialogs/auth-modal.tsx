@@ -173,7 +173,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md md:max-w-lg">
+      <DialogContent className="w-[90%] max-w-[350px] sm:max-w-md md:max-w-lg px-5 py-6 sm:py-6 rounded-[40px]">
         <DialogHeader>
           <DialogTitle>
             {type === "login" ? "Login" : "Sign Up"}
@@ -190,198 +190,33 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Login Form */}
         {type === "login" && (
-          <Form {...loginForm}>
-            <form
-              onSubmit={loginForm.handleSubmit(onLoginSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={loginForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={loginForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex items-center justify-between">
+          <div className="p-0 sm:p-6 bg-white rounded-lg shadow-sm">
+            <Form {...loginForm}>
+              <form
+                onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={loginForm.control}
-                  name="rememberMe"
+                  name="email"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                        <Input
+                          type="email"
+                          placeholder="your@email.com"
+                          {...field}
+                          className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                         />
                       </FormControl>
-                      <FormLabel className="cursor-pointer">
-                        Remember me
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-                <a
-                  href="#"
-                  className="text-sm text-primary hover:text-primary-dark"
-                >
-                  Forgot password?
-                </a>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </Button>
-
-              <div className="text-center text-sm text-gray-600">
-                <span>Don't have an account?</span>
-                <button
-                  type="button"
-                  onClick={() => onSwitchType(userType)}
-                  className="text-primary hover:text-primary-dark font-medium ml-1"
-                >
-                  Sign up
-                </button>
-              </div>
-
-              {userType === "user" && (
-                <div className="text-center text-sm text-gray-600 pt-2 border-t">
-                  <button
-                    type="button"
-                    onClick={() => onSwitchType("admin")}
-                    className="text-secondary hover:text-secondary-dark font-medium"
-                  >
-                    Login as Admin
-                  </button>
-                </div>
-              )}
-
-              {userType === "admin" && (
-                <div className="text-center text-sm text-gray-600 pt-2 border-t">
-                  <button
-                    type="button"
-                    onClick={() => onSwitchType("user")}
-                    className="text-primary hover:text-primary-dark font-medium"
-                  >
-                    Login as User
-                  </button>
-                </div>
-              )}
-            </form>
-          </Form>
-        )}
-
-        {/* Signup Form */}
-        {type === "signup" && (
-          <Form {...signupForm}>
-            <form
-              onSubmit={signupForm.handleSubmit(onSignupSubmit)}
-              className="space-y-4 max-h-[65vh] overflow-y-auto pr-4"
-            >
-              <FormField
-                control={signupForm.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={signupForm.control}
-                  name="dob"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
-                  control={signupForm.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="(123) 456-7890" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={signupForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={signupForm.control}
+                  control={loginForm.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -391,6 +226,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           type="password"
                           placeholder="••••••••"
                           {...field}
+                          className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                         />
                       </FormControl>
                       <FormMessage />
@@ -398,193 +234,349 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   )}
                 />
 
-                <FormField
-                  control={signupForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                  <FormField
+                    control={loginForm.control}
+                    name="rememberMe"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="cursor-pointer text-sm">
+                          Remember me
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                  <a
+                    href="#"
+                    className="text-sm text-primary hover:text-primary-dark"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
 
-              <FormField
-                control={signupForm.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your address" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                <Button
+                  type="submit"
+                  className="w-full gap-2"
+                  disabled={loginForm.formState.isSubmitting || isLoading}
+                >
+                  {(loginForm.formState.isSubmitting || isLoading) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {type === "login" ? "Login" : "Sign Up"}
+                </Button>
+
+                <div className="text-center text-sm text-gray-600 mt-4">
+                  <span>Don't have an account?</span>
+                  <button
+                    type="button"
+                    onClick={() => onSwitchType(userType)}
+                    className="text-primary hover:text-primary-dark font-medium ml-1"
+                  >
+                    Sign up
+                  </button>
+                </div>
+
+                {userType === "user" && (
+                  <div className="text-center text-sm text-gray-600 pt-2 border-t">
+                    <button
+                      type="button"
+                      onClick={() => onSwitchType("admin")}
+                      className="text-secondary hover:text-secondary-dark font-medium"
+                    >
+                      Login as Admin
+                    </button>
+                  </div>
                 )}
-              />
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {userType === "admin" && (
+                  <div className="text-center text-sm text-gray-600 pt-2 border-t">
+                    <button
+                      type="button"
+                      onClick={() => onSwitchType("user")}
+                      className="text-primary hover:text-primary-dark font-medium"
+                    >
+                      Login as User
+                    </button>
+                  </div>
+                )}
+              </form>
+            </Form>
+          </div>
+        )}
+
+        {/* Signup Form */}
+        {type === "signup" && (
+          <div className="p-6 bg-white rounded-lg shadow-sm">
+            <Form {...signupForm}>
+              <form
+                onSubmit={signupForm.handleSubmit(onSignupSubmit)}
+                className="space-y-4 max-h-[70vh] overflow-y-auto pr-4"
+              >
                 <FormField
                   control={signupForm.control}
-                  name="city"
+                  name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>City</FormLabel>
+                      <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="City" {...field} />
+                        <Input placeholder="John Doe" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={signupForm.control}
-                  name="state"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>State</FormLabel>
-                      <FormControl>
-                        <Input placeholder="State" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={signupForm.control}
+                    name="dob"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Birth</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="(123) 456-7890" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={signupForm.control}
-                  name="pincode"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pincode</FormLabel>
-                      <FormControl>
-                        <Input placeholder="123456" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {userType === "admin" && (
-                <FormField
-                  control={signupForm.control}
-                  name="secretCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Admin Secret Code</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter secret code"
+                          type="email"
+                          placeholder="your@email.com"
                           {...field}
-                          required
+                          className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                         />
                       </FormControl>
-                      <p className="text-xs text-gray-500 mt-1">
-                        This code is provided by the system manager.
-                      </p>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
 
-              <FormField
-                control={signupForm.control}
-                name="termsAccepted"
-                render={({ field }) => (
-                  <FormItem className="flex items-start space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-sm">
-                        I agree to the{" "}
-                        <a
-                          href="#"
-                          className="text-primary hover:text-primary-dark"
-                        >
-                          Terms of Service
-                        </a>{" "}
-                        and{" "}
-                        <a
-                          href="#"
-                          className="text-primary hover:text-primary-dark"
-                        >
-                          Privacy Policy
-                        </a>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={signupForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                            className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                            className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={signupForm.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your address" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={signupForm.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="City" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>State</FormLabel>
+                        <FormControl>
+                          <Input placeholder="State" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="pincode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pincode</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123456" {...field} className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {userType === "admin" && (
+                  <FormField
+                    control={signupForm.control}
+                    name="secretCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Admin Secret Code</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter secret code"
+                            {...field}
+                            required
+                            className="focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                          />
+                        </FormControl>
+                        <p className="text-xs text-gray-500 mt-1">
+                          This code is provided by the system manager.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <FormField
+                  control={signupForm.control}
+                  name="termsAccepted"
+                  render={({ field }) => (
+                    <FormItem className="flex items-start space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="mt-1"
+                        />
+                      </FormControl>
+                      <FormLabel className="text-sm font-normal cursor-pointer">
+                        I accept the <a href="#" className="underline">Terms and Conditions</a>
                       </FormLabel>
                       <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
+                    </FormItem>
+                  )}
+                />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing up...
-                  </>
-                ) : (
-                  "Sign Up"
-                )}
-              </Button>
-
-              <div className="text-center text-sm text-gray-600">
-                <span>Already have an account?</span>
-                <button
-                  type="button"
-                  onClick={() => onSwitchType(userType)}
-                  className="text-primary hover:text-primary-dark font-medium ml-1"
+                <Button
+                  type="submit"
+                  className="w-full gap-2"
+                  disabled={signupForm.formState.isSubmitting || isLoading}
                 >
-                  Login
-                </button>
-              </div>
+                  {(signupForm.formState.isSubmitting || isLoading) && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Sign Up
+                </Button>
 
-              {userType === "user" && (
-                <div className="text-center text-sm text-gray-600 pt-2 border-t">
+                <div className="text-center text-sm text-gray-600 mt-4">
+                  <span>Already have an account?</span>
                   <button
                     type="button"
-                    onClick={() => {
-                      signupForm.reset();
-                      onSwitchType("admin");
-                    }}
-                    className="text-secondary hover:text-secondary-dark font-medium"
+                    onClick={() => onSwitchType(userType)}
+                    className="text-primary hover:text-primary-dark font-medium ml-1"
                   >
-                    Sign up as Admin
+                    Login
                   </button>
                 </div>
-              )}
 
-              {userType === "admin" && (
-                <div className="text-center text-sm text-gray-600 pt-2 border-t">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      signupForm.reset();
-                      onSwitchType("user");
-                    }}
-                    className="text-primary hover:text-primary-dark font-medium"
-                  >
-                    Sign up as User
-                  </button>
-                </div>
-              )}
-            </form>
-          </Form>
+                {userType === "user" && (
+                  <div className="text-center text-sm text-gray-600 pt-2 border-t">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signupForm.reset();
+                        onSwitchType("admin");
+                      }}
+                      className="text-secondary hover:text-secondary-dark font-medium"
+                    >
+                      Sign up as Admin
+                    </button>
+                  </div>
+                )}
+
+                {userType === "admin" && (
+                  <div className="text-center text-sm text-gray-600 pt-2 border-t">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signupForm.reset();
+                        onSwitchType("user");
+                      }}
+                      className="text-primary hover:text-primary-dark font-medium"
+                    >
+                      Sign up as User
+                    </button>
+                  </div>
+                )}
+              </form>
+            </Form>
+          </div>
         )}
       </DialogContent>
     </Dialog>

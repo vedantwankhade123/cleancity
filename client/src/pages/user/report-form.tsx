@@ -188,7 +188,11 @@ const ReportForm: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 lg:pt-28">
+          {/* Spacing adjustments: 
+             - Mobile: pt-24 (6rem) for fixed navbar
+             - Desktop: lg:pt-28 (7rem) for larger screens with fixed navbar
+             - Bottom padding: pb-8 (2rem) for consistent spacing */}
           <Card className="max-w-4xl mx-auto">
             <CardHeader>
               <CardTitle>Submit New Waste Report</CardTitle>

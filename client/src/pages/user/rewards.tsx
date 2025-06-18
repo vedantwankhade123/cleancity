@@ -1,22 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Helmet } from "react-helmet-async";
+import { Coins, Loader2, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Coins, CheckCircle, Loader2, CreditCard, ChevronRight } from "lucide-react";
-import { Report } from "@shared/schema";
-import { useAuth } from "@/hooks/use-auth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/layout/navbar";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 import Footer from "@/components/layout/footer";
-import { toast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/utils";
-import { Helmet } from "react-helmet";
+
+type Report = {
+  id: string;
+  status: string;
+  rewardPoints?: number;
+  createdAt: string;
+  title?: string;
+  completedAt?: string;
+  // Add other report fields as needed
+};
 
 const UserRewards: React.FC = () => {
   const { user } = useAuth();
@@ -31,15 +34,6 @@ const UserRewards: React.FC = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Mock function to handle reward redemption
-  const handleRedeemReward = (points: number, amount: string) => {
-    // In a real app, this would call an API to redeem the reward
-    toast({
-      title: "Reward Redeemed",
-      description: `You've successfully redeemed ${points} points for ${amount}. We'll process your reward shortly.`,
-    });
-  };
-
   // Calculate total reward points
   const totalPoints = user?.rewardPoints || 0;
   
@@ -47,6 +41,50 @@ const UserRewards: React.FC = () => {
   const completedReportsWithRewards = reports?.filter(
     (report) => report.status === "completed" && report.rewardPoints
   ) || [];
+
+  // State for auth modals
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [authType, setAuthType] = useState<"user" | "admin">("user");
+  const { toast } = useToast();
+
+  // Fetch user points data
+  const { refetch } = useQuery({
+    queryKey: ['userPoints'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user/points');
+      return response;
+    },
+  });
+
+  const handleRedeemReward = async (points: number, amount: string) => {
+    try {
+      const response = await apiRequest('POST', '/api/rewards/redeem', {
+        points,
+        amount
+      });
+      
+      const data = await response.json(); // Parse the JSON response
+      
+      if (response.ok && data.success) { // Check both response.ok and your custom success flag
+        toast({
+          title: "Success!",
+          description: `You've successfully redeemed ${points} points for ${amount} cash reward.`,
+          variant: "default",
+        });
+        // Refetch points balance
+        refetch();
+      } else {
+        throw new Error(data.message || 'Failed to redeem reward');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to redeem reward",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <>
@@ -56,7 +94,11 @@ const UserRewards: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbar />
+        <Navbar 
+          setShowLoginModal={setShowLoginModal}
+          setShowSignupModal={setShowSignupModal}
+          setAuthType={setAuthType}
+        />
         
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
@@ -113,13 +155,13 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">$5 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹500 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">500 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(500, "$5")}
-                              disabled={totalPoints < 500}
+                              onClick={() => handleRedeemReward(500, "₹500")}
+                              disabled={!totalPoints || totalPoints < 500}
                             >
                               Redeem
                             </Button>
@@ -135,13 +177,13 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">$12 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹1000 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">1000 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(1000, "$12")}
-                              disabled={totalPoints < 1000}
+                              onClick={() => handleRedeemReward(1000, "₹1000")}
+                              disabled={!totalPoints || totalPoints < 1000}
                             >
                               Redeem
                             </Button>
@@ -157,13 +199,57 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">$35 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹2500 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">2500 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(2500, "$35")}
-                              disabled={totalPoints < 2500}
+                              onClick={() => handleRedeemReward(2500, "₹2500")}
+                              disabled={!totalPoints || totalPoints < 2500}
+                            >
+                              Redeem
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <Coins className="h-6 w-6" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold">₹1000 Cash Reward</h3>
+                                <p className="text-sm text-gray-500">1000 points</p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleRedeemReward(1000, "₹1000")}
+                              disabled={!totalPoints || totalPoints < 1000}
+                            >
+                              Redeem
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <Coins className="h-6 w-6" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold">₹2500 Cash Reward</h3>
+                                <p className="text-sm text-gray-500">2500 points</p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleRedeemReward(2500, "₹2500")}
+                              disabled={!totalPoints || totalPoints < 2500}
                             >
                               Redeem
                             </Button>
@@ -185,6 +271,32 @@ const UserRewards: React.FC = () => {
                     History of points earned and redeemed
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  {completedReportsWithRewards.length > 0 ? (
+                    <div className="space-y-4">
+                      {completedReportsWithRewards.map((report) => (
+                        <div key={report.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Coins className="h-5 w-5 text-green-500" />
+                            <div>
+                              <p className="font-medium">Report #{report.id}</p>
+                              <p className="text-sm text-gray-500">
+                                {formatDate(new Date(report.createdAt))}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-green-600">+{report.rewardPoints} pts</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      No reward history available
+                    </div>
+                  )}
+                </CardContent>
                 <CardContent>
                   {isLoading ? (
                     <div className="flex justify-center py-8">

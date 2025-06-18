@@ -11,6 +11,7 @@ import { ZodError } from "zod";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 // Define session data structure
 declare module "express-session" {
@@ -31,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxAge: 86400000, // 24 hours
         httpOnly: true,
         sameSite: 'lax',
-        secure: false // Set to true in production with HTTPS
+        secure: process.env.NODE_ENV === 'production' // Set to true in production with HTTPS
       },
       store: new MemoryStoreSession({
         checkPeriod: 86400000 // prune expired entries every 24h
@@ -135,8 +136,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.markAdminSecretCodeAsUsed(secretCode.id);
       }
       
+      // Hash password before creating user
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const userWithHashedPassword = { ...userData, password: hashedPassword };
+      
       // Create user
-      const user = await storage.createUser(userData);
+      const user = await storage.createUser(userWithHashedPassword);
       
       // Set session
       req.session.userId = user.id;
@@ -166,7 +171,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Find user by email
       const user = await storage.getUserByEmail(email);
       
-      if (!user || user.password !== password || user.role !== role) {
+      if (!user || user.role !== role) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      // Verify password
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       

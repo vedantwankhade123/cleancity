@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import AuthModal from "@/components/dialogs/auth-modal";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { TypingAnimation } from "@/components/ui/typing-animation";
+import CitiesSlider from "@/components/home/cities-slider";
 
 const HeroSection: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -33,22 +34,39 @@ const HeroSection: React.FC = () => {
   return (
     <section id="home" className="relative">
       <div 
-        className="hero-section"
-        style={{ 
-          backgroundImage: "url('https://pixabay.com/get/g43909b8fe0031cc5132a6c379627a6a02380090fa7d05cdfcf683908705533dd9d5fbcf483f37cad7d47eba363b0da0f9c618ebac6e0f78a382c01d2aaa906d3_1280.jpg')",
+        className="relative min-h-[96.5vh] flex flex-col items-center justify-center rounded-[40px] overflow-hidden pt-24 pb-12 m-[10px]"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=1920&h=1080')",
           backgroundSize: "cover", 
-          backgroundPosition: "center" 
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed"
         }}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 z-10">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl mb-6">
-              Keep Your City Clean & Green
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50" />
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl mb-6 min-h-[4.5rem] md:min-h-[5.5rem] flex items-center justify-center">
+              <TypingAnimation 
+                texts={[
+                  "Keep Your City Clean & Green",
+                  "Report Waste, Make a Difference",
+                  "Join CleanCity",
+                  "Together for a Cleaner Tomorrow"
+                ]}
+                speed={50}
+                deleteSpeed={30}
+                delayBeforeDelete={3000}
+                className="text-center"
+                cursorClassName="bg-white"
+                textClassName="text-white"
+              />
             </h1>
             <p className="text-xl text-white/90 mb-8">
               Join our community effort to identify and clean up waste in your neighborhood. Report waste, earn rewards, and make a difference.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={handleReportWaste} 
                 size="lg"
@@ -64,6 +82,11 @@ const HeroSection: React.FC = () => {
               >
                 Admin Login
               </Button>
+            </div>
+            
+            {/* Cities Slider */}
+            <div className="mt-12 w-full max-w-4xl mx-auto">
+              <CitiesSlider />
             </div>
           </div>
         </div>

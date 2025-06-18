@@ -25,7 +25,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Check, Save, User, AlertTriangle } from "lucide-react";
@@ -151,9 +150,8 @@ const UserProfile: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbar />
         
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8">
           <div className="max-w-4xl mx-auto">
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>

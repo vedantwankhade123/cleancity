@@ -69,7 +69,6 @@ import {
 } from "lucide-react";
 import { User as UserType, Report } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
-import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { toast } from "@/hooks/use-toast";
@@ -91,19 +90,33 @@ const userEditSchema = z.object({
 
 type UserEditFormValues = z.infer<typeof userEditSchema>;
 
+// Add new user form schema (only for user role)
+const newUserSchema = z.object({
+  fullName: z.string().min(3, "Full name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  pincode: z.string().optional(),
+});
+
+type NewUserFormValues = z.infer<typeof newUserSchema>;
+
 const AdminUsers: React.FC = () => {
   const { user } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("name");
 
   // Get user ID from URL if present
-  const [location] = useLocation();
   const searchParams = new URLSearchParams(location.split("?")[1] || "");
   const userIdParam = searchParams.get("id");
 
@@ -138,6 +151,21 @@ const AdminUsers: React.FC = () => {
       state: "",
       pincode: "",
       isActive: true,
+    },
+  });
+
+  // Add user form setup
+  const addUserForm = useForm<NewUserFormValues>({
+    resolver: zodResolver(newUserSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
     },
   });
 
@@ -216,6 +244,30 @@ const AdminUsers: React.FC = () => {
     },
   });
 
+  // Mutation for adding a new user
+  const addUserMutation = useMutation({
+    mutationFn: async (values: NewUserFormValues) => {
+      const response = await apiRequest("POST", "/api/users", values);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setIsAddUserDialogOpen(false);
+      addUserForm.reset();
+      toast({
+        title: "Success",
+        description: "New user has been added.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add new user.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Handle edit user
   const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
@@ -231,11 +283,13 @@ const AdminUsers: React.FC = () => {
   // Handle form submission
   const onSubmit = (values: UserEditFormValues) => {
     if (selectedUser) {
-      updateUserMutation.mutate({
-        userId: selectedUser.id,
-        userData: values
-      });
+      updateUserMutation.mutate({ userId: selectedUser.id, userData: values });
     }
+  };
+
+  // Handle add user form submission
+  const onAddUserSubmit = (values: NewUserFormValues) => {
+    addUserMutation.mutate(values);
   };
 
   // Filter and sort users
@@ -317,8 +371,7 @@ const AdminUsers: React.FC = () => {
                     <Filter className="h-4 w-4 mr-2" />
                     Filter
                   </Button>
-                  {/* Admin cannot add new users directly */}
-                  <Button disabled size="sm" className="gap-2">
+                  <Button size="sm" className="gap-2" onClick={() => setIsAddUserDialogOpen(true)}>
                     <UserPlus className="h-4 w-4" />
                     <span className="hidden md:inline">Add User</span>
                   </Button>
@@ -467,18 +520,32 @@ const AdminUsers: React.FC = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="hover:bg-gray-100 rounded-full p-2"
+                                    >
                                       <MoreVertical className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      Edit User
+                                  <DropdownMenuContent 
+                                    align="end" 
+                                    className="w-56 p-1.5 bg-white rounded-xl shadow-lg border border-gray-200"
+                                    sideOffset={8}
+                                  >
+                                    <DropdownMenuItem 
+                                      onClick={() => handleEditUser(user)}
+                                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
+                                    >
+                                      <Edit className="h-4 w-4 text-gray-500" />
+                                      <span>Edit User</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleDeleteUser(user)}>
-                                      <Trash className="h-4 w-4 mr-2 text-red-500" />
-                                      <span className="text-red-500">Delete User</span>
+                                    <DropdownMenuItem 
+                                      onClick={() => handleDeleteUser(user)}
+                                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
+                                    >
+                                      <Trash className="h-4 w-4 text-red-500" />
+                                      <span>Delete User</span>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -494,10 +561,140 @@ const AdminUsers: React.FC = () => {
             </Card>
           </main>
           
+          {/* Add User Dialog */}
+          <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+            <DialogContent className="sm:max-w-md md:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>Create a new user account.</DialogDescription>
+              </DialogHeader>
+              <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
+                <Form {...addUserForm}>
+                  <form onSubmit={addUserForm.handleSubmit(onAddUserSubmit)} className="space-y-4">
+                    <FormField
+                      control={addUserForm.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="john.doe@example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="••••••••" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="(123) 456-7890" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123 Main St" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="City" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="State" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={addUserForm.control}
+                      name="pincode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pincode (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="12345" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" disabled={addUserMutation.isPending}>
+                      {addUserMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Adding user...
+                        </>
+                      ) : (
+                        "Add User"
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           {/* Edit User Dialog */}
           {selectedUser && (
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-              <DialogContent className="sm:max-w-md">
+              <DialogContent className="sm:max-w-md md:max-w-lg">
                 <DialogHeader>
                   <DialogTitle>Edit User</DialogTitle>
                   <DialogDescription>

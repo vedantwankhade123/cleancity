@@ -19,35 +19,78 @@ const CameraComponent: React.FC<CameraComponentProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Start camera when the dialog opens
+  // Start/stop camera when the dialog opens/closes
   useEffect(() => {
-    if (isOpen && !stream) {
-      startCamera();
-    }
-    
-    // Clean up function to stop the camera when component unmounts or dialog closes
-    return () => {
+    if (isOpen) {
+      if (!stream) {
+        startCamera();
+      }
+      return () => {
+        if (stream) {
+          stream.getTracks().forEach(track => {
+            track.stop();
+          });
+          setStream(null);
+        }
+      };
+    } else {
+      // When dialog closes, stop the stream and reset the state
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
+        setStream(null);
       }
-    };
-  }, [isOpen, stream]);
+      setCapturedImage(null);
+    }
+  }, [isOpen]);
 
   const startCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" },
+      // First check if we have permission to access the camera
+      const permissionResult = await navigator.permissions.query({ name: 'camera' as PermissionName });
+      
+      if (permissionResult.state === 'denied') {
+        alert('Camera permission was denied. Please enable it in your browser settings and try again.');
+        return;
+      }
+
+      // Request camera access with specific constraints
+      const constraints = {
+        video: { 
+          facingMode: 'environment', // Use the rear camera if available
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
         audio: false 
-      });
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       
       setStream(mediaStream);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        // Play the video to start the camera
+        videoRef.current.play().catch(error => {
+          console.error("Error playing video:", error);
+          alert("Error starting camera. Please try again or check your browser settings.");
+        });
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
-      alert("Error accessing camera. Please make sure you have granted permission.");
+      let errorMessage = "Error accessing camera. ";
+      
+      if (error instanceof DOMException) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage += "Permission was denied. Please check your browser settings to allow camera access.";
+        } else if (error.name === 'NotFoundError') {
+          errorMessage += "No camera found. Please check if your device has a camera.";
+        } else {
+          errorMessage += error.message;
+        }
+      }
+      
+      alert(errorMessage);
+      setIsOpen(false); // Close the dialog on error
     }
   };
 

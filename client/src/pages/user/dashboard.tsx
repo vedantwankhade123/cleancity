@@ -48,7 +48,7 @@ const UserDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user?.fullName?.split(' ')[0]}</h1>
             <p className="text-gray-600">Here's an overview of your waste reports and rewards</p>
@@ -152,7 +152,7 @@ const UserDashboard: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">$5 Cash Reward</h5>
+                        <h5 className="font-medium">₹5 Cash Reward</h5>
                         <p className="text-sm text-gray-500">500 points required</p>
                       </div>
                       <Button 
@@ -165,7 +165,7 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">$12 Cash Reward</h5>
+                        <h5 className="font-medium">₹12 Cash Reward</h5>
                         <p className="text-sm text-gray-500">1000 points required</p>
                       </div>
                       <Button 
@@ -178,7 +178,7 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">$35 Cash Reward</h5>
+                        <h5 className="font-medium">₹35 Cash Reward</h5>
                         <p className="text-sm text-gray-500">2500 points required</p>
                       </div>
                       <Button 
