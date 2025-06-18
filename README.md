@@ -39,11 +39,12 @@ A full-stack web application for citizens to report waste management issues and 
 4. Vercel will automatically detect it's a Node.js app
 
 ### Step 3: Configure Project Settings
-1. **Framework Preset**: `Node.js`
+1. **Framework Preset**: `Vite` (Vercel will auto-detect this)
 2. **Root Directory**: `./` (leave as default)
-3. **Build Command**: `npm run vercel-build`
-4. **Output Directory**: `dist/public`
-5. **Install Command**: `npm ci`
+3. **Override Settings**:
+   - **Build Command**: `npm run vercel-build`
+   - **Output Directory**: `dist/public`
+   - **Install Command**: `npm ci`
 
 ### Step 4: Configure Environment Variables
 In your Vercel project settings, add these environment variables:
