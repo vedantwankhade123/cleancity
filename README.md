@@ -132,4 +132,4 @@ The app uses PostgreSQL with the following main tables:
 
 ## Support
 
-For deployment issues or questions, please check the Railway documentation or create an issue in the repository. 
+For deployment issues or questions, please check the Railway documentation or create an issue in the repository.
