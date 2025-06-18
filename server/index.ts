@@ -1,4 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
+import fs from "fs";
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -39,6 +41,36 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "CleanCity API is running" });
 });
 
+// Check if dist/public exists
+const distPath = path.join(process.cwd(), "dist", "public");
+const indexPath = path.join(distPath, "index.html");
+
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
+  
+  // Check if the dist directory exists
+  if (!fs.existsSync(distPath)) {
+    console.error(`Dist directory not found: ${distPath}`);
+    return res.status(500).json({ 
+      message: "Frontend not built. Please check the build process.",
+      error: "DIST_DIR_NOT_FOUND"
+    });
+  }
+  
+  // Check if index.html exists
+  if (!fs.existsSync(indexPath)) {
+    console.error(`Index.html not found: ${indexPath}`);
+    return res.status(500).json({ 
+      message: "Frontend build incomplete. Please check the build process.",
+      error: "INDEX_HTML_NOT_FOUND"
+    });
+  }
+  
+  next();
+});
+
 // Serve static files from the built frontend
 app.use(express.static("dist/public"));
 
@@ -47,7 +79,16 @@ app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api")) {
     return next();
   }
-  res.sendFile("index.html", { root: "dist/public" });
+  
+  try {
+    res.sendFile("index.html", { root: "dist/public" });
+  } catch (error) {
+    console.error("Error serving index.html:", error);
+    res.status(500).json({ 
+      message: "Error serving frontend",
+      error: "SERVE_ERROR"
+    });
+  }
 });
 
 // Error handling middleware
