@@ -23,7 +23,7 @@ export async function setupVite(app: Express, server: any) {
       });
       app.use(vite.middlewares);
     } catch (error) {
-      log("Vite setup failed:", error);
+      log("Vite setup failed:", error as string);
     }
   }
 }

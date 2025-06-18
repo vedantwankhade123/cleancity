@@ -246,17 +246,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Report routes
   // -------------
   
-  // Get all reports (admin)
+  // Get all reports (filtered by user role)
   app.get("/api/reports", requireAuth, async (req, res) => {
     try {
       let reports;
       
       // If admin, get all reports or filter by city
       if (req.session.role === "admin") {
-        reports = await storage.getReportsByCity(req.session.city);
+        reports = await storage.getReportsByCity(req.session.city || "");
       } else {
         // Regular users can only see their own reports
-        reports = await storage.getReportsByUserId(req.session.userId);
+        reports = await storage.getReportsByUserId(req.session.userId || 0);
       }
       
       res.json(reports);
@@ -282,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Regular users can only access their own reports
-      if (req.session.role !== "admin" && report.userId !== req.session.userId) {
+      if (req.session.role !== "admin" && report.userId !== (req.session.userId || 0)) {
         return res.status(403).json({ message: "Access denied" });
       }
       
@@ -313,7 +313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Assign current user as the report owner
       const report = await storage.createReport({
         ...reportData,
-        userId: req.session.userId
+        userId: req.session.userId || 0
       });
       
       console.log("Report created successfully:", report.id);
@@ -349,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const updatedReport = await storage.updateReportStatus(reportId, {
         ...statusData,
-        adminNotes: statusData.adminNotes || report.adminNotes
+        adminNotes: statusData.adminNotes || report.adminNotes || undefined
       });
       
       res.json(updatedReport);
@@ -365,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all users (admin only)
   app.get("/api/users", requireAdmin, async (req, res) => {
     try {
-      const users = await storage.getUsersByCity(req.session.city);
+      const users = await storage.getUsersByCity(req.session.city || "");
       
       // Remove passwords from response
       const sanitizedUsers = users.map(user => {
@@ -389,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     // Only admins can update other users
-    if (req.session.role !== "admin" && userId !== req.session.userId) {
+    if (req.session.role !== "admin" && userId !== (req.session.userId || 0)) {
       return res.status(403).json({ message: "Access denied" });
     }
     
@@ -401,7 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Admins can only update users in their own city
-      if (req.session.role === "admin" && user.city !== req.session.city) {
+      if (req.session.role === "admin" && user.city !== (req.session.city || "")) {
         return res.status(403).json({ message: "Access denied" });
       }
       
@@ -447,12 +447,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Admins can only delete users in their own city
-      if (user.city !== req.session.city) {
+      if (user.city !== (req.session.city || "")) {
         return res.status(403).json({ message: "Access denied" });
       }
       
       // Admin cannot delete themselves
-      if (userId === req.session.userId) {
+      if (userId === (req.session.userId || 0)) {
         return res.status(400).json({ message: "Cannot delete your own account" });
       }
       
