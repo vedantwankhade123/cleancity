@@ -5,7 +5,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/' : '/',
+  base: './', // Use relative paths for assets
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -26,12 +26,17 @@ export default defineConfig(({ mode }) => ({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
+  publicDir: path.resolve(import.meta.dirname, "client", "public"),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     sourcemap: true,
+    assetsInlineLimit: 0, // Ensure all assets are copied as files
     rollupOptions: {
       output: {
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash][extname]',
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           vendor: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
