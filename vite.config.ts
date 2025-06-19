@@ -5,7 +5,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: './', // Use relative paths for assets
+  base: '/', // Use root-relative paths for Vercel
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     sourcemap: true,
-    assetsInlineLimit: 0, // Ensure all assets are copied as files
+    assetsInlineLimit: 0,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name].[hash].js',
