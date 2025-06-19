@@ -11,18 +11,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#10b981" />
-  </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/assets/index.js"></script>
-    <!-- Remove replit dev banner in production -->
-    <script>
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const script = document.createElement('script');
-        script.src = 'https://replit.com/public/js/replit-dev-banner.js';
-        script.async = true;
-        document.body.appendChild(script);
-      }
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>
