@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import { Express, Request, Response, Router } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
@@ -7,6 +7,7 @@ import {
   insertReportSchema, 
   updateReportStatusSchema
 } from "@shared/schema";
+import airQualityRouter from "./routes/air-quality";
 import { ZodError } from "zod";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -82,12 +83,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   };
 
-  // API Routes
-  // ===========
+  // API routes
+  const apiRouter = Router();
+  app.use('/api', apiRouter);
 
-  // Authentication routes
+  // Air quality route
+  apiRouter.use('/air-quality', airQualityRouter);
+
+  // Auth routes
   // --------------------
-  
+
   // User registration
   app.post("/api/auth/register", async (req, res) => {
     const validation = validateRequest(insertUserSchema, req.body);

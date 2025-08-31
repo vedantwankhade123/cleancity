@@ -17,6 +17,7 @@ const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
 const AdminReports = lazy(() => import("@/pages/admin/reports"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminProfile = lazy(() => import("@/pages/admin/profile"));
+const AirQuality = lazy(() => import("@/pages/air-quality"));
 
 function LoadingSpinner() {
   return (
@@ -81,6 +82,14 @@ function Router() {
       </div>
       
       <Switch>
+        <Route path="/air-quality">
+          <AirQuality 
+            setShowLoginModal={setShowLoginModal}
+            setShowSignupModal={setShowSignupModal}
+            setAuthType={setAuthType}
+          />
+        </Route>
+        
         <Route 
           path="/"
           component={() => (

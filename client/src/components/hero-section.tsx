@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import AuthModal from "@/components/dialogs/auth-modal";
 import { useLocation } from "wouter";
 import { TypingAnimation } from "@/components/ui/typing-animation";
-import CitiesSlider from "@/components/home/cities-slider";
 
 const HeroSection: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -55,12 +54,12 @@ const HeroSection: React.FC = () => {
                   "Join CleanCity",
                   "Together for a Cleaner Tomorrow"
                 ]}
-                speed={50}
-                deleteSpeed={30}
-                delayBeforeDelete={3000}
+                transitionDuration={800}
+                displayDuration={3000}
                 className="text-center"
                 cursorClassName="bg-white"
                 textClassName="text-white"
+                showCursor={false}
               />
             </h1>
             <p className="text-xl text-white/90 mb-8">
@@ -82,11 +81,6 @@ const HeroSection: React.FC = () => {
               >
                 Admin Login
               </Button>
-            </div>
-            
-            {/* Cities Slider */}
-            <div className="mt-12 w-full max-w-4xl mx-auto">
-              <CitiesSlider />
             </div>
           </div>
         </div>

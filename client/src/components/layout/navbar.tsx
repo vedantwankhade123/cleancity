@@ -33,8 +33,22 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
-  const [location] = useLocation();
+  const [currentLocation, navigate] = useLocation();
   const [scrolled, setScrolled] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    setIsMenuOpen(false);
+    if (window.location.pathname === '/') {
+      // If we're already on the homepage, scroll to the section
+      const element = document.querySelector(path);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // If we're not on the homepage, navigate to the homepage with the hash
+      navigate(`/${path}`);
+    }
+  };
 
   // Fetch notifications for authenticated users
   const { data: notifications, isLoading: isLoadingNotifications } = useQuery<Notification[]>({
@@ -85,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({
   const navbarClass = cn(
     "fixed top-0 z-50 transition-all duration-300 mt-5 left-[20px] right-[20px]",
     "rounded-[40px] overflow-hidden",
-    location === '/' && !scrolled
+    window.location.pathname === '/' && !scrolled
       ? "bg-transparent"
       : "bg-white/95 backdrop-blur-sm shadow-sm",
     scrolled && "py-2"
@@ -93,7 +107,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   const linkClass = cn(
     "relative transition-colors duration-200",
-    location === '/' && !scrolled
+    window.location.pathname === '/' && !scrolled
       ? "font-bold text-white hover:text-gray-200"
       : "font-medium text-gray-700 hover:text-primary",
     "after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-200 hover:after:w-full"
@@ -120,17 +134,32 @@ const Navbar: React.FC<NavbarProps> = ({
             <Link href="/" className={linkClass}>
               Home
             </Link>
-            <Link href="/#about" className={linkClass}>
+            <button 
+              onClick={() => handleNavigation('#about')} 
+              className={linkClass}
+            >
               About
-            </Link>
-            <Link href="/#how-it-works" className={linkClass}>
+            </button>
+            <button 
+              onClick={() => handleNavigation('#how-it-works')} 
+              className={linkClass}
+            >
               How It Works
-            </Link>
-            <Link href="/#rewards" className={linkClass}>
+            </button>
+            <button 
+              onClick={() => handleNavigation('#rewards')} 
+              className={linkClass}
+            >
               Rewards
-            </Link>
-            <Link href="/#contact" className={linkClass}>
+            </button>
+            <button 
+              onClick={() => handleNavigation('#contact')} 
+              className={linkClass}
+            >
               Contact
+            </button>
+            <Link href="/air-quality" className={linkClass}>
+              Air Quality
             </Link>
           </nav>
 
@@ -146,7 +175,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       size="icon" 
                       className={cn(
                         "relative transition-colors",
-                        location === '/' && !scrolled
+                        window.location.pathname === '/' && !scrolled
                           ? "text-white hover:bg-white/20"
                           : "text-gray-700 hover:bg-primary/10"
                       )}
@@ -193,7 +222,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       variant="ghost"
                       className={cn(
                         "flex items-center gap-2 px-2 transition-colors",
-                         location === '/' && !scrolled
+                         window.location.pathname === '/' && !scrolled
                           ? "text-white hover:bg-white/20"
                           : "text-gray-700 hover:bg-primary/10"
                       )}
@@ -240,7 +269,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   variant="outline"
                   className={cn(
                     "transition-colors",
-                    location === '/' && !scrolled
+                    window.location.pathname === '/' && !scrolled
                           ? "bg-white border-primary text-primary hover:bg-primary hover:text-white"
                           : "border-primary text-primary hover:bg-primary hover:text-white"
                   )}
@@ -252,7 +281,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   variant="default"
                   className={cn(
                      "transition-colors",
-                    location === '/' && !scrolled
+                    window.location.pathname === '/' && !scrolled
                           ? "bg-white text-primary hover:bg-primary hover:text-white"
                           : "bg-primary text-white hover:bg-primary-dark"
                   )}
@@ -272,7 +301,7 @@ const Navbar: React.FC<NavbarProps> = ({
               onClick={toggleMenu}
               className={cn(
                 "transition-colors",
-                location === '/' && !scrolled ? "text-white" : "text-gray-700"
+                window.location.pathname === '/' && !scrolled ? "text-white" : "text-gray-700"
               )}
             >
               {isMenuOpen ? (
@@ -293,25 +322,52 @@ const Navbar: React.FC<NavbarProps> = ({
         )}
       >
         <div className="px-4 pt-2 pb-3 space-y-1">
-          <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          <Link 
+            href="/" 
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             Home
           </Link>
-          <Link href="/#about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          <button 
+            onClick={() => handleNavigation('#about')}
+            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             About
-          </Link>
-          <Link href="/#how-it-works" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          </button>
+          <button 
+            onClick={() => handleNavigation('#how-it-works')}
+            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             How It Works
-          </Link>
-          <Link href="/#rewards" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          </button>
+          <button 
+            onClick={() => handleNavigation('#rewards')}
+            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             Rewards
-          </Link>
-          <Link href="/#contact" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors">
+          </button>
+          <button 
+            onClick={() => handleNavigation('#contact')}
+            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
             Contact
+          </button>
+          <Link 
+            href="/air-quality" 
+            onClick={() => setIsMenuOpen(false)}
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            Air Quality
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link href={getDashboardLink()} className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:bg-gray-100 transition-colors">
+              <Link 
+                href={getDashboardLink()} 
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-3 py-2 rounded-md text-base font-medium text-primary hover:bg-gray-100 transition-colors"
+              >
                 Dashboard
               </Link>
               <Link
@@ -320,12 +376,16 @@ const Navbar: React.FC<NavbarProps> = ({
                     ? "/admin/profile"
                     : "/user/profile"
                 }
+                onClick={() => setIsMenuOpen(false)}
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 Profile
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
                 className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
               >
                 Logout
