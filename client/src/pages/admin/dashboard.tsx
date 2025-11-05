@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Bookmark,
-  Calendar,
+  Calendar as CalendarIcon,
   Flag,
   MoreVertical,
   Clock,
@@ -23,9 +23,17 @@ import ReportStatusBadge from "@/components/report-status-badge";
 import { formatDate, timeAgo } from "@/lib/utils";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(new Date().setDate(new Date().getDate() - 30)),
+    to: new Date(),
+  });
 
   // Fetch reports
   const { 
@@ -45,21 +53,33 @@ const AdminDashboard: React.FC = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Count reports by status
-  const getTotalReports = () => reports?.length || 0;
-  const getReportsByStatus = (status: string) => 
-    reports?.filter(r => r.status === status).length || 0;
-
-  // Recent activity data generation
-  const getRecentActivity = () => {
+  // Filter reports based on selected date range
+  const filteredReports = React.useMemo(() => {
     if (!reports) return [];
+    if (!date?.from) return reports;
+
+    const fromDate = date.from;
+    const toDate = date.to ? new Date(date.to.setHours(23, 59, 59, 999)) : new Date(new Date().setHours(23, 59, 59, 999));
+
+    return reports.filter(report => {
+      const reportDate = new Date(report.createdAt);
+      return reportDate >= fromDate && reportDate <= toDate;
+    });
+  }, [reports, date]);
+
+  // Count reports by status using filtered data
+  const getTotalReports = () => filteredReports?.length || 0;
+  const getReportsByStatus = (status: string) => 
+    filteredReports?.filter(r => r.status === status).length || 0;
+
+  // Recent activity data generation using filtered data
+  const getRecentActivity = () => {
+    if (!filteredReports) return [];
     
-    // Sort reports by updatedAt in descending order
-    const sortedReports = [...reports].sort(
+    const sortedReports = [...filteredReports].sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
     
-    // Take the 4 most recent reports
     return sortedReports.slice(0, 4);
   };
 
@@ -102,10 +122,36 @@ const AdminDashboard: React.FC = () => {
                   <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span className="hidden md:inline">Today</span>
-                  </Button>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2 w-[240px] justify-start text-left font-normal">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span className="hidden md:inline">
+                          {date?.from ? (
+                            date.to ? (
+                              <>
+                                {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                              </>
+                            ) : (
+                              format(date.from, "LLL dd, y")
+                            )
+                          ) : (
+                            "Pick a date"
+                          )}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={date?.from}
+                        selected={date}
+                        onSelect={setDate}
+                        numberOfMonths={2}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <User className="h-4 w-4" />
@@ -134,7 +180,6 @@ const AdminDashboard: React.FC = () => {
                 icon={Flag}
                 iconColor="text-primary"
                 iconBgColor="bg-primary/10"
-                trend={{ value: "+14% from last month", isPositive: true }}
               />
               
               <StatsCard
@@ -143,7 +188,6 @@ const AdminDashboard: React.FC = () => {
                 icon={Clock}
                 iconColor="text-gray-600"
                 iconBgColor="bg-gray-100"
-                trend={{ value: "8 high priority", isPositive: false }}
               />
               
               <StatsCard
@@ -152,7 +196,6 @@ const AdminDashboard: React.FC = () => {
                 icon={Loader2}
                 iconColor="text-orange-600"
                 iconBgColor="bg-orange-100"
-                trend={{ value: "12 scheduled for today", isPositive: true }}
               />
               
               <StatsCard
@@ -161,7 +204,6 @@ const AdminDashboard: React.FC = () => {
                 icon={CheckCircle}
                 iconColor="text-green-600"
                 iconBgColor="bg-green-100"
-                trend={{ value: "+23% from last month", isPositive: true }}
               />
             </div>
 
@@ -180,12 +222,12 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex justify-center items-center py-12">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ) : !reports || reports.length === 0 ? (
+                ) : !filteredReports || filteredReports.length === 0 ? (
                   <div className="text-center py-12">
                     <Flag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium">No reports yet</h3>
+                    <h3 className="text-lg font-medium">No reports in this period</h3>
                     <p className="text-gray-500 mt-2">
-                      Reports from citizens will appear here
+                      Try selecting a different date range to see reports.
                     </p>
                   </div>
                 ) : (
@@ -211,7 +253,7 @@ const AdminDashboard: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {reports.slice(0, 4).map((report) => (
+                        {filteredReports.slice(0, 4).map((report) => (
                           <tr key={report.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
