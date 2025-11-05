@@ -183,14 +183,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type, userType, 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[90%] max-w-4xl rounded-xl p-0 overflow-hidden">
+      <DialogContent className="w-[90%] max-w-5xl rounded-xl p-0 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left Column: Image */}
-          <div className="hidden md:block relative">
+          <div className="hidden md:block relative bg-gray-100">
             <img
               src={type === 'login' ? '/login.png' : '/signup.png'}
               alt={type === 'login' ? 'Login illustration' : 'Signup illustration'}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain p-4"
             />
           </div>
 
