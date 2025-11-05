@@ -59,7 +59,7 @@ const HeroSection: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-8 items-center min-h-screen pt-24 md:pt-0">
           {/* Left Column: Text Content */}
           <motion.div
-            className="text-left"
+            className="text-left flex flex-col justify-center"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
