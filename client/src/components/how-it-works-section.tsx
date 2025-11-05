@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { UserPlus, Camera, MapPin, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const steps = [
@@ -32,7 +32,7 @@ const HowItWorksSection: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % steps.length);
-    }, 2500); // Change step every 2.5 seconds
+    }, 3000); // Change step every 3 seconds
 
     return () => clearInterval(interval);
   }, []);
@@ -49,7 +49,7 @@ const HowItWorksSection: React.FC = () => {
 
         <div className="relative">
           {/* Desktop connecting lines */}
-          <div className="hidden md:flex absolute top-1/2 left-0 w-full h-1 -translate-y-1/2">
+          <div className="hidden md:flex absolute top-1/2 left-0 w-full h-1 -translate-y-1/2 mt-[-40px]">
             <div className="w-full bg-gray-200 rounded-full h-1 relative">
               <motion.div
                 className="bg-primary h-1 rounded-full"
@@ -64,20 +64,28 @@ const HowItWorksSection: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
             {steps.map((step, index) => (
-              <div key={index} className="text-center flex flex-col items-center">
+              <motion.div
+                key={index}
+                className={cn(
+                  "text-center p-6 rounded-xl border-2 transition-all duration-500",
+                  activeIndex === index
+                    ? "bg-white border-primary shadow-xl scale-105"
+                    : "bg-transparent border-transparent opacity-70"
+                )}
+              >
                 <div
                   className={cn(
-                    "w-24 h-24 rounded-full flex items-center justify-center transition-all duration-500 relative z-10",
+                    "w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-500 relative z-10",
                     activeIndex === index
-                      ? "bg-primary text-white scale-110 shadow-lg"
+                      ? "bg-primary text-white"
                       : "bg-white text-primary border-2 border-gray-200"
                   )}
                 >
                   <step.icon className="w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-semibold mt-6 mb-2">{step.title}</h3>
-                <p className="text-gray-600 px-2">{step.description}</p>
-              </div>
+                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                <p className="text-gray-600 px-2 text-sm">{step.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
