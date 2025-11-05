@@ -9,10 +9,13 @@ import {
   Report,
   InsertReport,
   UpdateReportStatus,
+  adminRequests,
+  AdminRequest,
+  InsertAdminRequest,
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { db } from "./db";
-import { eq, and, like, inArray } from "drizzle-orm";
+import { eq, and, like, inArray, count } from "drizzle-orm";
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
@@ -68,20 +71,20 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(users)
-      .where(like(users.city, `%${city}%`));
+      .where(eq(users.city, city));
   }
 
   async getUserAdminsCountByCity(city: string): Promise<number> {
     const result = await db
-      .select({ count: users.id })
+      .select({ value: count() })
       .from(users)
       .where(
         and(
-          like(users.city, `%${city}%`),
+          eq(users.city, city),
           eq(users.role, "admin")
         )
       );
-    return result.length;
+    return result[0]?.value ?? 0;
   }
 
   // Admin secret code operations
@@ -188,6 +191,38 @@ export class DatabaseStorage implements IStorage {
   async deleteReport(id: number): Promise<boolean> {
     const result = await db.delete(reports).where(eq(reports.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Admin request operations
+  async createAdminRequest(request: InsertAdminRequest): Promise<AdminRequest> {
+    const result = await db.insert(adminRequests).values(request).returning();
+    return result[0];
+  }
+
+  async getAdminRequestById(id: number): Promise<AdminRequest | undefined> {
+    const result = await db.select().from(adminRequests).where(eq(adminRequests.id, id));
+    return result[0];
+  }
+
+  async getPendingAdminRequestsByCity(city: string): Promise<AdminRequest[]> {
+    return await db
+      .select()
+      .from(adminRequests)
+      .where(
+        and(
+          eq(adminRequests.city, city),
+          eq(adminRequests.status, "pending")
+        )
+      );
+  }
+
+  async updateAdminRequestStatus(id: number, status: "approved" | "rejected"): Promise<AdminRequest | undefined> {
+    const result = await db
+      .update(adminRequests)
+      .set({ status })
+      .where(eq(adminRequests.id, id))
+      .returning();
+    return result[0];
   }
 }
 
