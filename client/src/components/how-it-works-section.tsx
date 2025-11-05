@@ -69,7 +69,7 @@ const HowItWorksSection: React.FC = () => {
             <React.Fragment key={index}>
               <motion.div
                 onClick={() => handleStepClick(index)}
-                className="text-center p-6 rounded-xl cursor-pointer w-64 flex-shrink-0"
+                className="text-center p-6 rounded-xl cursor-pointer w-64 flex-shrink-0 relative z-10 bg-gray-50"
                 animate={activeIndex === index ? "active" : "inactive"}
                 variants={{
                   active: {
@@ -81,7 +81,6 @@ const HowItWorksSection: React.FC = () => {
                   inactive: {
                     scale: 1,
                     borderColor: "transparent",
-                    backgroundColor: "transparent",
                     boxShadow: "0 0 #0000",
                   },
                 }}
@@ -107,7 +106,7 @@ const HowItWorksSection: React.FC = () => {
               </motion.div>
 
               {index < steps.length - 1 && (
-                <div className="relative flex-1 h-0.5 mt-10 -translate-y-1/2">
+                <div className="relative flex-1 h-0.5 mt-10 z-0">
                   <div className="bg-gray-200 h-full w-full rounded-full" />
                   <motion.div
                     className="bg-primary h-full absolute top-0 left-0 rounded-full"
