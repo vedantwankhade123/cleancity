@@ -197,7 +197,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleNext = async () => {
     const isValid = await signupForm.trigger(currentStepInfo.fields as any)
-    if (isValid && step < totalSteps) setStep(prev => prev + 1)
+    if (isValid && step < totalSteps) {
+      setStep(prev => prev + 1)
+    }
   }
 
   const handleBack = () => setStep(prev => prev - 1)
