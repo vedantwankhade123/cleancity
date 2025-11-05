@@ -1,41 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { UserPlus, Camera, MapPin, CheckCircle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const steps = [
   {
     icon: UserPlus,
-    title: "Sign Up",
-    description: "Create your free account to get started.",
+    title: "1. Sign Up",
+    description: "Create your free account to join our community of city cleaners.",
   },
   {
     icon: Camera,
-    title: "Take a Photo",
-    description: "Capture the waste with your device camera.",
+    title: "2. Report Waste",
+    description: "Spot an issue? Snap a photo and provide a quick description.",
   },
   {
     icon: MapPin,
-    title: "Mark Location",
-    description: "Set the waste location on the map.",
+    title: "3. Mark Location",
+    description: "Pinpoint the exact location on the map for our cleanup crews.",
   },
   {
     icon: CheckCircle,
-    title: "Submit Report",
-    description: "Complete your report and earn points.",
+    title: "4. Get Rewarded",
+    description: "Once the issue is resolved, you earn points for your contribution.",
   },
 ];
 
 const HowItWorksSection: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startSlideshow = () => {
+    stopSlideshow(); // Ensure no multiple intervals are running
+    intervalRef.current = setInterval(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % steps.length);
+    }, 4000); // Change step every 4 seconds
+  };
+
+  const stopSlideshow = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % steps.length);
-    }, 3000); // Change step every 3 seconds
-
-    return () => clearInterval(interval);
+    startSlideshow();
+    return () => stopSlideshow();
   }, []);
+
+  const handleStepClick = (index: number) => {
+    stopSlideshow();
+    setActiveIndex(index);
+  };
 
   return (
     <section id="how-it-works" className="py-20 bg-gray-50 overflow-hidden">
@@ -43,7 +59,7 @@ const HowItWorksSection: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
           <p className="text-lg text-gray-600">
-            Making a difference is easy with our simple 4-step process
+            Making a difference is easy with our simple 4-step process.
           </p>
         </div>
 
@@ -66,19 +82,33 @@ const HowItWorksSection: React.FC = () => {
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                className={cn(
-                  "text-center p-6 rounded-xl border-2 transition-all duration-500",
-                  activeIndex === index
-                    ? "bg-white border-primary shadow-xl scale-105"
-                    : "bg-transparent border-transparent opacity-70"
-                )}
+                onClick={() => handleStepClick(index)}
+                className="text-center p-6 rounded-xl cursor-pointer border-2"
+                animate={activeIndex === index ? "active" : "inactive"}
+                variants={{
+                  active: {
+                    scale: 1.05,
+                    opacity: 1,
+                    borderColor: "hsl(var(--primary))",
+                    backgroundColor: "hsl(var(--background))",
+                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                  },
+                  inactive: {
+                    scale: 1,
+                    opacity: 0.7,
+                    borderColor: "transparent",
+                    backgroundColor: "transparent",
+                    boxShadow: "0 0 #0000",
+                  },
+                }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
               >
                 <div
                   className={cn(
-                    "w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-500 relative z-10",
+                    "w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center transition-colors duration-500 relative z-10 border-2",
                     activeIndex === index
-                      ? "bg-primary text-white"
-                      : "bg-white text-primary border-2 border-gray-200"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white text-primary border-gray-200"
                   )}
                 >
                   <step.icon className="w-10 h-10" />
