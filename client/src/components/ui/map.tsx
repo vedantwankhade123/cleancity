@@ -1,8 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { LatLngExpression, LatLng, Icon } from "leaflet";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Locate } from "lucide-react";
-import { useLocation } from "@/hooks/use-location";
+import { Button } from "@/components/ui/button";
+import { Search, LocateFixed, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+// Fix for default icon issue with webpack
+import "leaflet/dist/images/marker-icon.png";
+import "leaflet/dist/images/marker-shadow.png";
+
+const defaultIcon = new Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 interface MapComponentProps {
   onLocationSelect: (latitude: string, longitude: string, address: string) => void;
@@ -11,11 +24,49 @@ interface MapComponentProps {
   initialAddress?: string;
 }
 
-declare global {
-  interface Window {
-    L: any;
-  }
-}
+const DraggableMarker = ({ position, setPosition, onAddressUpdate }: { position: LatLng, setPosition: (pos: LatLng) => void, onAddressUpdate: (address: string) => void }) => {
+  const markerRef = useRef<any>(null);
+  const map = useMap();
+
+  const eventHandlers = useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const newPos = marker.getLatLng();
+          setPosition(newPos);
+          map.panTo(newPos);
+          
+          // Reverse geocode to get address
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPos.lat}&lon=${newPos.lng}`)
+            .then(res => res.json())
+            .then(data => {
+              onAddressUpdate(data.display_name || "Address not found");
+            });
+        }
+      },
+    }),
+    [map, setPosition, onAddressUpdate],
+  );
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+      icon={defaultIcon}
+    />
+  );
+};
+
+const MapRecenter = ({ center }: { center: LatLngExpression }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center);
+  }, [center, map]);
+  return null;
+};
 
 const MapComponent: React.FC<MapComponentProps> = ({
   onLocationSelect,
@@ -23,263 +74,103 @@ const MapComponent: React.FC<MapComponentProps> = ({
   initialLongitude,
   initialAddress,
 }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<LatLng>(new LatLng(20.9374, 77.7796)); // Default to Amravati
+  const [mapCenter, setMapCenter] = useState<LatLngExpression>([20.9374, 77.7796]);
+  const [address, setAddress] = useState(initialAddress || "Amravati, Maharashtra, India");
   const [searchQuery, setSearchQuery] = useState("");
-  const [map, setMap] = useState<any>(null);
-  const [marker, setMarker] = useState<any>(null);
-  const [selectedLocation, setSelectedLocation] = useState<{
-    lat: string;
-    lng: string;
-    address: string;
-  }>({
-    lat: initialLatitude || "",
-    lng: initialLongitude || "",
-    address: initialAddress || "",
-  });
-  
-  const { 
-    getCurrentLocation,
-    isLoading: isLocationLoading,
-    error: locationError
-  } = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Initialize map when component mounts
   useEffect(() => {
-    // Load Leaflet CSS
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
-    link.crossOrigin = "";
-    document.head.appendChild(link);
-
-    // Load Leaflet JS
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
-    script.crossOrigin = "";
-    script.onload = initializeMap;
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup
-      document.head.removeChild(link);
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  const initializeMap = () => {
-    if (!mapRef.current || !window.L) return;
-
-    // Initialize the map
-    const leafletMap = window.L.map(mapRef.current).setView([20, 0], 2);
-
-    // Add OpenStreetMap tile layer
-    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(leafletMap);
-
-    // Set initial marker if coordinates provided
     if (initialLatitude && initialLongitude) {
-      const initialMarker = window.L.marker(
-        [parseFloat(initialLatitude), parseFloat(initialLongitude)],
-        { draggable: true }
-      ).addTo(leafletMap);
-      
-      leafletMap.setView([parseFloat(initialLatitude), parseFloat(initialLongitude)], 15);
-      
-      initialMarker.on("dragend", handleMarkerDragEnd);
-      setMarker(initialMarker);
+      const initialPos = new LatLng(parseFloat(initialLatitude), parseFloat(initialLongitude));
+      setPosition(initialPos);
+      setMapCenter([parseFloat(initialLatitude), parseFloat(initialLongitude)]);
     }
+  }, [initialLatitude, initialLongitude]);
 
-    // Add click event to map
-    leafletMap.on("click", handleMapClick);
+  useEffect(() => {
+    onLocationSelect(position.lat.toString(), position.lng.toString(), address);
+  }, [position, address, onLocationSelect]);
 
-    setMap(leafletMap);
-  };
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery) return;
 
-  const handleMapClick = async (e: any) => {
-    const { lat, lng } = e.latlng;
-    
-    // Update or create marker
-    if (marker) {
-      marker.setLatLng([lat, lng]);
-    } else {
-      const newMarker = window.L.marker([lat, lng], { draggable: true }).addTo(map);
-      newMarker.on("dragend", handleMarkerDragEnd);
-      setMarker(newMarker);
-    }
-    
-    // Get address from coordinates
-    const address = await getAddressFromCoordinates(lat, lng);
-    
-    // Update selected location
-    const newLocation = {
-      lat: lat.toFixed(6),
-      lng: lng.toFixed(6),
-      address,
-    };
-    
-    setSelectedLocation(newLocation);
-    onLocationSelect(newLocation.lat, newLocation.lng, newLocation.address);
-  };
-
-  const handleMarkerDragEnd = async (e: any) => {
-    const { lat, lng } = e.target.getLatLng();
-    
-    // Get address from coordinates
-    const address = await getAddressFromCoordinates(lat, lng);
-    
-    // Update selected location
-    const newLocation = {
-      lat: lat.toFixed(6),
-      lng: lng.toFixed(6),
-      address,
-    };
-    
-    setSelectedLocation(newLocation);
-    onLocationSelect(newLocation.lat, newLocation.lng, newLocation.address);
-  };
-
-  const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
+    setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-      );
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
-      return data.display_name || "Unknown location";
-    } catch (error) {
-      console.error("Error getting address:", error);
-      return "Address lookup failed";
-    }
-  };
-
-  const searchLocation = async () => {
-    if (!searchQuery.trim() || !map) return;
-
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          searchQuery
-        )}`
-      );
-      const data = await response.json();
-
       if (data && data.length > 0) {
         const { lat, lon, display_name } = data[0];
-        
-        // Move map to the location
-        map.setView([lat, lon], 15);
-        
-        // Update or create marker
-        if (marker) {
-          marker.setLatLng([lat, lon]);
-        } else {
-          const newMarker = window.L.marker([lat, lon], { draggable: true }).addTo(map);
-          newMarker.on("dragend", handleMarkerDragEnd);
-          setMarker(newMarker);
-        }
-        
-        // Update selected location
-        const newLocation = {
-          lat: lat,
-          lng: lon,
-          address: display_name,
-        };
-        
-        setSelectedLocation(newLocation);
-        onLocationSelect(newLocation.lat, newLocation.lng, newLocation.address);
+        const newPos = new LatLng(parseFloat(lat), parseFloat(lon));
+        setPosition(newPos);
+        setMapCenter([parseFloat(lat), parseFloat(lon)]);
+        setAddress(display_name);
       } else {
-        alert("Location not found. Please try a different search term.");
+        toast({ title: "Location not found", description: "Please try a different search term.", variant: "destructive" });
       }
     } catch (error) {
-      console.error("Error searching location:", error);
-      alert("Error searching for location. Please try again.");
+      toast({ title: "Search failed", description: "Could not connect to the location service.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleUseCurrentLocation = async () => {
-    try {
-      const position = await getCurrentLocation();
-      
-      if (position && map) {
-        const { latitude, longitude } = position.coords;
+  const handleGetCurrentLocation = () => {
+    setIsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const newPos = new LatLng(latitude, longitude);
+        setPosition(newPos);
+        setMapCenter([latitude, longitude]);
         
-        // Move map to current location
-        map.setView([latitude, longitude], 15);
-        
-        // Update or create marker
-        if (marker) {
-          marker.setLatLng([latitude, longitude]);
-        } else {
-          const newMarker = window.L.marker([latitude, longitude], { draggable: true }).addTo(map);
-          newMarker.on("dragend", handleMarkerDragEnd);
-          setMarker(newMarker);
-        }
-        
-        // Get address from coordinates
-        const address = await getAddressFromCoordinates(latitude, longitude);
-        
-        // Update selected location
-        const newLocation = {
-          lat: latitude.toFixed(6),
-          lng: longitude.toFixed(6),
-          address,
-        };
-        
-        setSelectedLocation(newLocation);
-        onLocationSelect(newLocation.lat, newLocation.lng, newLocation.address);
+        // Reverse geocode
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+          .then(res => res.json())
+          .then(data => {
+            setAddress(data.display_name || "Current Location");
+            setIsLoading(false);
+          });
+      },
+      (error) => {
+        toast({ title: "Geolocation Error", description: error.message, variant: "destructive" });
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error getting current location:", error);
-      alert("Error getting your current location. Please enable location services in your browser.");
-    }
+    );
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Input
-            placeholder="Search for a location..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && searchLocation()}
-            className="pr-10"
-          />
-          <Button
-            variant="ghost"
-            type="button"
-            size="icon"
-            className="absolute right-0 top-0"
-            onClick={searchLocation}
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
-        <Button
-          variant="secondary"
-          onClick={handleUseCurrentLocation}
-          disabled={isLocationLoading}
-          className="gap-2"
-        >
-          <Locate className="h-4 w-4" />
-          {isLocationLoading ? "Getting Location..." : "Use Current Location"}
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <Input
+          placeholder="Search for a location..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Button type="submit" size="icon" disabled={isLoading}>
+          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
         </Button>
+      </form>
+      <Button variant="outline" className="w-full gap-2" onClick={handleGetCurrentLocation} disabled={isLoading}>
+        <LocateFixed className="h-4 w-4" />
+        Use My Current Location
+      </Button>
+      <div className="h-64 w-full rounded-md overflow-hidden z-0">
+        <MapContainer center={mapCenter} zoom={13} style={{ height: "100%", width: "100%" }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <DraggableMarker position={position} setPosition={setPosition} onAddressUpdate={setAddress} />
+          <MapRecenter center={mapCenter} />
+        </MapContainer>
       </div>
-
-      <div 
-        ref={mapRef} 
-        className="h-[300px] w-full rounded-md border border-input bg-gray-50"
-      ></div>
-
-      {selectedLocation.address && (
-        <div className="mt-2 p-2 bg-primary/10 rounded-md text-sm flex items-start gap-2">
-          <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-          <span>{selectedLocation.address}</span>
-        </div>
-      )}
+      <div className="p-2 bg-gray-100 rounded-md text-sm">
+        <p className="font-semibold">Selected Address:</p>
+        <p className="text-gray-600">{address}</p>
+      </div>
     </div>
   );
 };

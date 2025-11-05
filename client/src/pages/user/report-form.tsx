@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { fileToBase64 } from "@/lib/utils";
-import { Image, X, FileText, Camera, MapPin, Send } from "lucide-react";
+import { Image, X, FileText, Camera, MapPin, Send, Loader2 } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import CameraComponent from "@/components/ui/camera";
