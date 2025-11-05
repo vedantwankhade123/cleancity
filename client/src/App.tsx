@@ -106,59 +106,49 @@ function Router() {
           />
         </Route>
         
-        <Route 
-          path="/"
-          component={() => (
-            <Landing 
-              setShowLoginModal={(show) => handleOpenModal('login', 'user')}
-              setShowSignupModal={(show) => handleOpenModal('signup', 'user')}
-              setAuthType={setAuthType}
-            />
-          )}
-        />
+        <Route path="/">
+          <Landing 
+            setShowLoginModal={(show) => handleOpenModal('login', 'user')}
+            setShowSignupModal={(show) => handleOpenModal('signup', 'user')}
+            setAuthType={setAuthType}
+          />
+        </Route>
 
         {/* User routes */}
-        <Route 
-          path="/user/dashboard" 
-          component={(props) => <ProtectedRoute component={UserDashboard} requiredRole="user" {...props} />} 
-        />
-        <Route 
-          path="/user/report-new" 
-          component={(props) => <ProtectedRoute component={UserReportForm} requiredRole="user" {...props} />} 
-        />
-        <Route 
-          path="/user/reports" 
-          component={(props) => <ProtectedRoute component={UserReports} requiredRole="user" {...props} />} 
-        />
-        <Route 
-          path="/user/rewards" 
-          component={(props) => <ProtectedRoute component={UserRewards} requiredRole="user" {...props} />} 
-        />
-        <Route 
-          path="/user/profile" 
-          component={(props) => <ProtectedRoute component={UserProfile} requiredRole="user" {...props} />} 
-        />
+        <Route path="/user/dashboard">
+          <ProtectedRoute component={UserDashboard} requiredRole="user" />
+        </Route>
+        <Route path="/user/report-new">
+          <ProtectedRoute component={UserReportForm} requiredRole="user" />
+        </Route>
+        <Route path="/user/reports">
+          <ProtectedRoute component={UserReports} requiredRole="user" />
+        </Route>
+        <Route path="/user/rewards">
+          <ProtectedRoute component={UserRewards} requiredRole="user" />
+        </Route>
+        <Route path="/user/profile">
+          <ProtectedRoute component={UserProfile} requiredRole="user" />
+        </Route>
 
         {/* Admin routes */}
-        <Route 
-          path="/admin/dashboard" 
-          component={(props) => <ProtectedRoute component={AdminDashboard} requiredRole="admin" {...props} />} 
-        />
-        <Route 
-          path="/admin/reports" 
-          component={(props) => <ProtectedRoute component={AdminReports} requiredRole="admin" {...props} />} 
-        />
-        <Route 
-          path="/admin/users" 
-          component={(props) => <ProtectedRoute component={AdminUsers} requiredRole="admin" {...props} />} 
-        />
-        <Route 
-          path="/admin/profile" 
-          component={(props) => <ProtectedRoute component={AdminProfile} requiredRole="admin" {...props} />} 
-        />
+        <Route path="/admin/dashboard">
+          <ProtectedRoute component={AdminDashboard} requiredRole="admin" />
+        </Route>
+        <Route path="/admin/reports">
+          <ProtectedRoute component={AdminReports} requiredRole="admin" />
+        </Route>
+        <Route path="/admin/users">
+          <ProtectedRoute component={AdminUsers} requiredRole="admin" />
+        </Route>
+        <Route path="/admin/profile">
+          <ProtectedRoute component={AdminProfile} requiredRole="admin" />
+        </Route>
 
         {/* Fallback to 404 */}
-        <Route component={NotFound} />
+        <Route>
+          <NotFound />
+        </Route>
       </Switch>
 
       {/* Auth Modal */}
