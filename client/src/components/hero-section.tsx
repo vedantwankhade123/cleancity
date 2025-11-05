@@ -128,7 +128,7 @@ const HeroSection: React.FC = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <img 
-              src="/cleancity-hero.png" 
+              src="/cleancity hero.png" 
               alt="Clean City Illustration" 
               className="w-full max-w-lg h-auto"
             />
