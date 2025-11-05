@@ -109,14 +109,14 @@ const Navbar: React.FC<NavbarProps> = ({
   );
 
   const buttonClass = cn(
-    "transition-colors",
+    "transition-all duration-300 hover:scale-105",
     (isHomePage && !scrolled)
       ? "border-white text-white hover:bg-white hover:text-primary"
       : "border-primary text-primary hover:bg-primary hover:text-white"
   );
 
   const primaryButtonClass = cn(
-    "transition-colors",
+    "transition-all duration-300 hover:scale-105",
     (isHomePage && !scrolled)
       ? "bg-white text-primary hover:bg-gray-200"
       : "bg-primary text-white hover:bg-primary-dark"

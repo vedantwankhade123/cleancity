@@ -54,34 +54,25 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section id="home" className="relative w-full">
-      <div
-        className="relative min-h-screen flex items-center rounded-[40px] overflow-hidden m-[10px]"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1618223245121-F1318aa24a2e?auto=format&fit=crop&q=80&w=1920&h=1080')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="home" className="relative w-full bg-gradient-to-br from-gray-50 via-white to-green-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-8 items-center min-h-screen pt-24 md:pt-0">
+          {/* Left Column: Text Content */}
           <motion.div
-            className="max-w-2xl text-left"
+            className="text-left"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
             <motion.h1
-              className="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl leading-tight mb-6"
+              className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl leading-tight mb-6"
               variants={itemVariants}
             >
               Transforming Our Cities, <br />
               <span className="gradient-text">Together.</span>
             </motion.h1>
             <motion.p
-              className="text-lg text-white/90 mb-10 max-w-lg"
+              className="text-lg text-gray-600 mb-10 max-w-lg"
               variants={itemVariants}
             >
               Be a part of the change. Spot, report, and resolve cleanliness
@@ -102,31 +93,45 @@ const HeroSection: React.FC = () => {
                 onClick={handleAdminLogin}
                 variant="outline"
                 size="lg"
-                className="px-8 py-6 bg-white/10 backdrop-blur-sm text-white border-white/50 hover:bg-white/20 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                className="px-8 py-6 bg-transparent text-primary border-primary hover:bg-primary/5 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
               >
                 Admin Login
               </Button>
             </motion.div>
 
             <motion.div
-              className="mt-16 flex flex-col sm:flex-row items-start sm:items-center gap-6 text-white/90"
+              className="mt-16 flex flex-col sm:flex-row items-start sm:items-center gap-6 text-gray-700"
               variants={itemVariants}
             >
               <div className="flex items-center gap-3">
                 <Flag className="h-6 w-6 text-accent" />
                 <span className="font-medium">Report Issues</span>
               </div>
-              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
+              <div className="hidden sm:block h-6 w-px bg-gray-300"></div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-6 w-6 text-accent" />
                 <span className="font-medium">Track Progress</span>
               </div>
-              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
+              <div className="hidden sm:block h-6 w-px bg-gray-300"></div>
               <div className="flex items-center gap-3">
                 <Award className="h-6 w-6 text-accent" />
                 <span className="font-medium">Earn Rewards</span>
               </div>
             </motion.div>
+          </motion.div>
+
+          {/* Right Column: Illustration */}
+          <motion.div 
+            className="flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <img 
+              src="/cleancity-hero.png" 
+              alt="Clean City Illustration" 
+              className="w-full max-w-lg h-auto"
+            />
           </motion.div>
         </div>
       </div>
