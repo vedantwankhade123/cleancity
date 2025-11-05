@@ -445,122 +445,64 @@ const AdminUsers: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
-                        <tr>
-                          <th 
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                            onClick={() => setSortBy("name")}
-                          >
-                            User
-                            {sortBy === "name" && <span className="ml-1">↓</span>}
-                          </th>
-                          <th 
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                            onClick={() => setSortBy("city")}
-                          >
-                            Location
-                            {sortBy === "city" && <span className="ml-1">↓</span>}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Reports
-                          </th>
-                          <th 
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                            onClick={() => setSortBy("status")}
-                          >
-                            Status
-                            {sortBy === "status" && <span className="ml-1">↓</span>}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredUsers.map((user) => {
-                          const { total: reportCount, completed: completedCount } = getUserReportsCount(user.id);
-                          
-                          return (
-                            <tr key={user.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                                    <User className="h-5 w-5" />
-                                  </div>
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {user.fullName}
-                                    </div>
-                                    <div className="text-sm text-gray-500">
-                                      {user.email}
-                                    </div>
-                                  </div>
+                  <>
+                    {/* Desktop Table */}
+                    <div className="overflow-x-auto hidden md:block">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" onClick={() => setSortBy("name")}>User {sortBy === "name" && <span className="ml-1">↓</span>}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" onClick={() => setSortBy("city")}>Location {sortBy === "city" && <span className="ml-1">↓</span>}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reports</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700" onClick={() => setSortBy("status")}>Status {sortBy === "status" && <span className="ml-1">↓</span>}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredUsers.map((user) => {
+                            const { total: reportCount, completed: completedCount } = getUserReportsCount(user.id);
+                            return (
+                              <tr key={user.id} className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><User className="h-5 w-5" /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{user.fullName}</div><div className="text-sm text-gray-500">{user.email}</div></div></div></td>
+                                <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{user.city}</div><div className="text-sm text-gray-500">{user.state}</div></td>
+                                <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{reportCount} reports</div><div className="text-sm text-gray-500">{completedCount} completed</div></td>
+                                <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>{user.isActive ? "Active" : "Inactive"}</span></td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="hover:bg-gray-100 rounded-full p-2"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-56 p-1.5 bg-white rounded-xl shadow-lg border border-gray-200" sideOffset={8}><DropdownMenuItem onClick={() => handleEditUser(user)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"><Edit className="h-4 w-4 text-gray-500" /><span>Edit User</span></DropdownMenuItem><DropdownMenuItem onClick={() => handleDeleteUser(user)} className="flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"><Trash className="h-4 w-4 text-red-500" /><span>Delete User</span></DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Mobile Card List */}
+                    <div className="space-y-4 md:hidden">
+                      {filteredUsers.map((user) => {
+                        const { total: reportCount, completed: completedCount } = getUserReportsCount(user.id);
+                        return (
+                          <Card key={user.id}>
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                              <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><User className="h-5 w-5" /></div>
+                                <div>
+                                  <p className="font-semibold text-gray-900">{user.fullName}</p>
+                                  <p className="text-sm text-gray-500">{user.email}</p>
                                 </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">
-                                  {user.city}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {user.state}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">
-                                  {reportCount} reports
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {completedCount} completed
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                  user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                                }`}>
-                                  {user.isActive ? "Active" : "Inactive"}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="hover:bg-gray-100 rounded-full p-2"
-                                    >
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent 
-                                    align="end" 
-                                    className="w-56 p-1.5 bg-white rounded-xl shadow-lg border border-gray-200"
-                                    sideOffset={8}
-                                  >
-                                    <DropdownMenuItem 
-                                      onClick={() => handleEditUser(user)}
-                                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
-                                    >
-                                      <Edit className="h-4 w-4 text-gray-500" />
-                                      <span>Edit User</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                      onClick={() => handleDeleteUser(user)}
-                                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
-                                    >
-                                      <Trash className="h-4 w-4 text-red-500" />
-                                      <span>Delete User</span>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end"><DropdownMenuItem onClick={() => handleEditUser(user)}>Edit</DropdownMenuItem><DropdownMenuItem onClick={() => handleDeleteUser(user)} className="text-red-600">Delete</DropdownMenuItem></DropdownMenuContent>
+                              </DropdownMenu>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-3 gap-4 pt-2">
+                              <div><p className="text-xs text-gray-500">Location</p><p className="text-sm font-medium">{user.city}</p></div>
+                              <div><p className="text-xs text-gray-500">Reports</p><p className="text-sm font-medium">{reportCount}</p></div>
+                              <div><p className="text-xs text-gray-500">Status</p><span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>{user.isActive ? "Active" : "Inactive"}</span></div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>

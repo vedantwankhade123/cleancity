@@ -214,12 +214,12 @@ const AdminDashboard: React.FC = () => {
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16 items-center">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
                 </div>
                 <div className="flex items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2 w-[240px] justify-start text-left font-normal">
+                      <Button variant="outline" size="sm" className="gap-2 w-auto md:w-[240px] justify-start text-left font-normal">
                         <CalendarIcon className="h-4 w-4" />
                         <span className="hidden md:inline">
                           {date?.from ? (
@@ -292,8 +292,8 @@ const AdminDashboard: React.FC = () => {
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <User className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-medium hidden md:block">
-                      {user?.fullName || "Admin"}
+                    <span className="text-sm font-medium hidden sm:block">
+                      {user?.fullName?.split(" ")[0] || "Admin"}
                     </span>
                   </div>
                 </div>
@@ -367,109 +367,56 @@ const AdminDashboard: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Report
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Location
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredReports.slice(0, 4).map((report) => (
-                          <tr key={report.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 overflow-hidden">
-                                  <img
-                                    src={report.imageUrl}
-                                    alt={report.title}
-                                    className="h-10 w-10 object-cover"
-                                  />
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">
-                                    {report.title}
-                                  </div>
-                                  <div className="text-sm text-gray-500">
-                                    Reported by: User #{report.userId}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {report.address.split(",")[0]}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">
-                                {formatDate(report.createdAt)}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {new Date(report.createdAt).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <ReportStatusBadge status={report.status} />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <Link href={`/admin/reports?id=${report.id}`}>
-                                <Button variant="link" className="text-secondary hover:text-secondary-dark mr-3">
-                                  View
-                                </Button>
-                              </Link>
-                              {report.status === "pending" && (
-                                <Button variant="link" className="text-green-600 hover:text-green-800">
-                                  Process
-                                </Button>
-                              )}
-                            </td>
+                  <>
+                    {/* Desktop Table */}
+                    <div className="overflow-x-auto hidden md:block">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredReports.slice(0, 4).map((report) => (
+                            <tr key={report.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 overflow-hidden"><img src={report.imageUrl} alt={report.title} className="h-10 w-10 object-cover" /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{report.title}</div><div className="text-sm text-gray-500">Reported by: User #{report.userId}</div></div></div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{report.address.split(",")[0]}</div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{formatDate(report.createdAt)}</div><div className="text-sm text-gray-500">{new Date(report.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><ReportStatusBadge status={report.status} /></td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><Link href={`/admin/reports?id=${report.id}`}><Button variant="link" className="text-secondary hover:text-secondary-dark mr-3">View</Button></Link>{report.status === "pending" && (<Button variant="link" className="text-green-600 hover:text-green-800">Process</Button>)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Mobile Card List */}
+                    <div className="space-y-4 md:hidden">
+                      {filteredReports.slice(0, 4).map((report) => (
+                        <Card key={report.id} className="p-4">
+                          <div className="flex items-start gap-4">
+                            <img src={report.imageUrl} alt={report.title} className="h-16 w-16 object-cover rounded-md" />
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-semibold text-gray-900">{report.title}</h4>
+                                <ReportStatusBadge status={report.status} />
+                              </div>
+                              <p className="text-sm text-gray-500 mt-1">{report.address.split(",")[0]}</p>
+                              <p className="text-xs text-gray-500 mt-2">{formatDate(report.createdAt)}</p>
+                            </div>
+                          </div>
+                          <div className="mt-4 pt-4 border-t flex justify-end gap-2">
+                            <Link href={`/admin/reports?id=${report.id}`}><Button size="sm" variant="outline">View Details</Button></Link>
+                            {report.status === "pending" && (<Button size="sm">Process</Button>)}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </>
                 )}
-                
-                <div className="mt-6 flex justify-between items-center">
-                  <div className="text-sm text-gray-500">
-                    Showing {Math.min(4, getTotalReports())} of {getTotalReports()} reports
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" disabled>
-                      Previous
-                    </Button>
-                    <Button size="sm" className="bg-primary">
-                      1
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      2
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      3
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Next
-                    </Button>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -499,90 +446,32 @@ const AdminDashboard: React.FC = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead>
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              User
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Reports
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {users
-                            .filter(u => u.role === "user")
-                            .slice(0, 3)
-                            .map((user) => {
-                              const userReports = reports?.filter(r => r.userId === user.id) || [];
-                              const completedReports = userReports.filter(r => r.status === "completed").length;
-                              
-                              return (
-                                <tr key={user.id} className="hover:bg-gray-50">
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
-                                        <User className="h-5 w-5" />
-                                      </div>
-                                      <div className="ml-4">
-                                        <div className="text-sm font-medium text-gray-900">
-                                          {user.fullName}
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                          {user.email}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                      {userReports.length} reports
-                                    </div>
-                                    <div className="text-sm text-gray-500">
-                                      {completedReports} completed
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                      user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                                    }`}>
-                                      {user.isActive ? "Active" : "Inactive"}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <Link href={`/admin/users?id=${user.id}`}>
-                                      <Button variant="link" className="text-secondary hover:text-secondary-dark mr-3">
-                                        Edit
-                                      </Button>
-                                    </Link>
-                                    <Button variant="link" className="text-red-600 hover:text-red-800">
-                                      {user.isActive ? "Disable" : "Enable"}
-                                    </Button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                        </tbody>
-                      </table>
+                    <div className="space-y-4">
+                      {users
+                        .filter(u => u.role === "user")
+                        .slice(0, 3)
+                        .map((user) => {
+                          const userReports = reports?.filter(r => r.userId === user.id) || [];
+                          const completedReports = userReports.filter(r => r.status === "completed").length;
+                          
+                          return (
+                            <div key={user.id} className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><User className="h-5 w-5" /></div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{user.fullName}</p>
+                                  <p className="text-sm text-gray-500">{user.email}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium">{userReports.length} reports</p>
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>{user.isActive ? "Active" : "Inactive"}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
                     </div>
                   )}
-                  
-                  <div className="mt-6 flex justify-end">
-                    <Link href="/admin/users">
-                      <Button className="gap-2">
-                        <User className="h-4 w-4" />
-                        View All Users
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
               </div>
 
@@ -643,12 +532,6 @@ const AdminDashboard: React.FC = () => {
                       </ul>
                     </div>
                   )}
-                  
-                  <div className="mt-6 flex justify-center">
-                    <Button variant="link" className="text-primary hover:text-primary-dark font-medium">
-                      View All Activity
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
