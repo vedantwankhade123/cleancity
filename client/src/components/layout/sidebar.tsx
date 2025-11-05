@@ -8,13 +8,13 @@ import {
   LayoutDashboard,
   Flag,
   Users,
-  BarChart3,
-  Settings,
   User,
   LogOut,
   Menu,
   X,
   UserCheck,
+  Shield,
+  BarChart3,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -36,13 +36,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
 
   // Mobile sidebar toggle button
   const MobileToggle = () => (
-    <div className="fixed bottom-4 right-4 md:hidden z-50">
+    <div className="fixed bottom-4 right-4 md:hidden z-[60]">
       <Button
         onClick={toggleSidebar}
         size="icon"
-        className="h-12 w-12 rounded-full bg-primary text-white shadow-lg"
+        className="h-14 w-14 rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-transform hover:scale-110"
       >
-        {isOpen ? <X /> : <Menu />}
+        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </Button>
     </div>
   );
@@ -54,103 +54,81 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
 
   // Link styling based on active state
   const getLinkStyles = (path: string) => {
-    return isActive(path)
-      ? "flex items-center px-4 py-3 text-white bg-gray-800"
-      : "flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white";
+    return cn(
+      "flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200",
+      isActive(path)
+        ? "bg-primary/10 text-primary"
+        : "text-gray-400 hover:bg-gray-800 hover:text-white"
+    );
   };
 
   // Admin navigation links
   const adminNavLinks = [
-    {
-      href: "/admin/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/admin/reports",
-      label: "Waste Reports",
-      icon: <Flag className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/admin/users",
-      label: "User Management",
-      icon: <Users className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/admin/requests",
-      label: "Admin Requests",
-      icon: <UserCheck className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/admin/profile",
-      label: "Profile",
-      icon: <User className="w-5 h-5 mr-3" />,
-    },
+    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/reports", label: "Waste Reports", icon: Flag },
+    { href: "/admin/users", label: "User Management", icon: Users },
+    { href: "/admin/requests", label: "Admin Requests", icon: UserCheck },
   ];
 
   // User navigation links
   const userNavLinks = [
-    {
-      href: "/user/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/user/reports",
-      label: "My Reports",
-      icon: <Flag className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/user/rewards",
-      label: "Rewards",
-      icon: <BarChart3 className="w-5 h-5 mr-3" />,
-    },
-    {
-      href: "/user/profile",
-      label: "Profile",
-      icon: <User className="w-5 h-5 mr-3" />,
-    },
+    { href: "/user/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/user/reports", label: "My Reports", icon: Flag },
+    { href: "/user/rewards", label: "Rewards", icon: BarChart3 },
   ];
 
-  // Choose links based on user role
   const navLinks = isAdmin ? adminNavLinks : userNavLinks;
+  const profileLink = isAdmin ? "/admin/profile" : "/user/profile";
 
   // Sidebar content
   const SidebarContent = () => (
-    <>
-      <div className="flex items-center justify-center h-16 border-b border-gray-800">
-        <Link href="/" className="text-primary text-2xl font-bold">
-          Clean<span className="text-secondary">City</span>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-center h-20 shrink-0 px-4 border-b border-gray-800">
+        <Link href="/" className="text-2xl font-bold transition-transform hover:scale-105">
+          <span className="text-primary">Clean</span>
+          <span className="text-secondary">City</span>
         </Link>
       </div>
       
-      <ScrollArea className="flex-1">
-        <nav className="mt-6">
-          <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase">
-            Main
-          </div>
-          
+      {/* Navigation */}
+      <ScrollArea className="flex-grow">
+        <nav className="flex-1 px-4 py-6 space-y-2">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} className={getLinkStyles(link.href)}>
-              {link.icon}
+              <link.icon className="w-5 h-5 mr-3" />
               <span>{link.label}</span>
             </Link>
           ))}
-          
-          <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase mt-4">
-            Account
-          </div>
-          
+        </nav>
+      </ScrollArea>
+
+      {/* Footer / User Profile */}
+      <div className="mt-auto p-4 border-t border-gray-800">
+        <div className="space-y-4">
+          <Link href={profileLink} className={getLinkStyles(profileLink)}>
+            <User className="w-5 h-5 mr-3" />
+            <span>Profile</span>
+          </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white"
+            className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
           >
             <LogOut className="w-5 h-5 mr-3" />
             <span>Logout</span>
           </button>
-        </nav>
-      </ScrollArea>
-    </>
+        </div>
+        <div className="flex items-center gap-3 mt-6">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <Shield className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white truncate">{user?.fullName}</p>
+            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -165,20 +143,24 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
         <SidebarContent />
       </aside>
 
-      {/* Mobile sidebar */}
-      <aside
+      {/* Mobile sidebar overlay */}
+      <div
         className={cn(
-          "fixed inset-0 bg-black/50 z-50 md:hidden",
-          isOpen ? "flex" : "hidden"
+          "fixed inset-0 bg-black/60 z-[55] md:hidden transition-opacity duration-300",
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={() => setIsOpen(false)}
+      />
+      
+      {/* Mobile sidebar panel */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-[60] md:hidden transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          className
+        )}
       >
-        <div
-          className="w-64 bg-gray-900 h-full flex flex-col"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <SidebarContent />
-        </div>
+        <SidebarContent />
       </aside>
 
       {/* Mobile toggle button */}
