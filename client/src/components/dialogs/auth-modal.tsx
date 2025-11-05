@@ -183,52 +183,64 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type, userType, 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[90%] max-w-md rounded-xl p-0 overflow-hidden">
-        <div className="p-6">
-          <DialogHeader className="text-center mb-4">
-            <DialogTitle className="text-2xl font-bold"><span className="text-primary">Clean</span><span className="text-secondary">City</span></DialogTitle>
-            <DialogDescription>{type === 'login' ? `Welcome back! Login as ${userType}` : `Create your ${userType} account`}</DialogDescription>
-          </DialogHeader>
+      <DialogContent className="w-[90%] max-w-4xl rounded-xl p-0 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* Left Column: Image */}
+          <div className="hidden md:block relative">
+            <img
+              src={type === 'login' ? '/login.png' : '/signup.png'}
+              alt={type === 'login' ? 'Login illustration' : 'Signup illustration'}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
 
-          {error && <Alert variant="destructive" className="mb-4"><AlertTriangle className="h-4 w-4" /><AlertTitle>Authentication Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
+          {/* Right Column: Form */}
+          <div className="p-6 md:p-8 flex flex-col justify-center">
+            <DialogHeader className="text-center mb-4">
+              <DialogTitle className="text-2xl font-bold"><span className="text-primary">Clean</span><span className="text-secondary">City</span></DialogTitle>
+              <DialogDescription>{type === 'login' ? `Welcome back! Login as ${userType}` : `Create your ${userType} account`}</DialogDescription>
+            </DialogHeader>
 
-          {type === "login" ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                <FormField control={loginForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><Input type="email" placeholder="your@email.com" {...field} className="pl-10" /></div></FormControl><FormMessage /></FormItem>)} />
-                <FormField control={loginForm.control} name="password" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><Input type="password" placeholder="••••••••" {...field} className="pl-10" /></div></FormControl><FormMessage /></FormItem>)} />
-                <div className="flex items-center justify-between"><FormField control={loginForm.control} name="rememberMe" render={({ field }) => (<FormItem className="flex items-center space-x-2 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="cursor-pointer text-sm">Remember me</FormLabel></FormItem>)} /><a href="#" className="text-sm text-primary hover:underline">Forgot password?</a></div>
-                <Button type="submit" className="w-full gap-2" disabled={isLoading}>{isLoading && <Loader2 className="h-4 w-4 animate-spin" />} Login</Button>
-              </form>
-            </Form>
-          ) : (
-            <Form {...signupForm}>
-              <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-700">{currentStepInfo.icon}<span>{currentStepInfo.title}</span></div>
-                  <div className="text-sm text-gray-500">Step {step} of {totalSteps}</div>
-                </div>
-                <ProgressBar currentStep={step} totalSteps={totalSteps} />
-                <AnimatePresence mode="wait">
-                  <motion.div key={step} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }} className="min-h-[240px]">
-                    {renderSignupStepContent()}
-                  </motion.div>
-                </AnimatePresence>
-                <div className="flex justify-between items-center pt-2">
-                  {step > 1 ? <Button type="button" variant="outline" onClick={handleBack} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button> : <div />}
-                  {step < totalSteps ? <Button type="button" onClick={handleNext} className="gap-2">Next <ArrowRight className="h-4 w-4" /></Button> : <Button type="submit" disabled={isLoading}>{isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create Account</Button>}
-                </div>
-              </form>
-            </Form>
-          )}
+            {error && <Alert variant="destructive" className="mb-4"><AlertTriangle className="h-4 w-4" /><AlertTitle>Authentication Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
 
-          <div className="text-center text-sm text-gray-600 mt-4 pt-4 border-t">
-            {type === 'login' ? "Don't have an account? " : "Already have an account? "}
-            <button onClick={() => onSwitchType(type === 'login' ? 'signup' : 'login', userType)} className="text-primary font-medium hover:underline">{type === 'login' ? 'Sign up' : 'Login'}</button>
-            <span className="mx-2">|</span>
-            <button onClick={() => onSwitchType(type, userType === 'user' ? 'admin' : 'user')} className="text-secondary font-medium hover:underline">
-              {userType === 'user' ? `${type === 'login' ? 'Admin Login' : 'Admin Signup'}` : `${type === 'login' ? 'User Login' : 'User Signup'}`}
-            </button>
+            {type === "login" ? (
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                  <FormField control={loginForm.control} name="email" render={({ field }) => (<FormItem><FormLabel>Email</FormLabel><FormControl><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><Input type="email" placeholder="your@email.com" {...field} className="pl-10" /></div></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={loginForm.control} name="password" render={({ field }) => (<FormItem><FormLabel>Password</FormLabel><FormControl><div className="relative"><Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><Input type="password" placeholder="••••••••" {...field} className="pl-10" /></div></FormControl><FormMessage /></FormItem>)} />
+                  <div className="flex items-center justify-between"><FormField control={loginForm.control} name="rememberMe" render={({ field }) => (<FormItem className="flex items-center space-x-2 space-y-0"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><FormLabel className="cursor-pointer text-sm">Remember me</FormLabel></FormItem>)} /><a href="#" className="text-sm text-primary hover:underline">Forgot password?</a></div>
+                  <Button type="submit" className="w-full gap-2" disabled={isLoading}>{isLoading && <Loader2 className="h-4 w-4 animate-spin" />} Login</Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...signupForm}>
+                <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700">{currentStepInfo.icon}<span>{currentStepInfo.title}</span></div>
+                    <div className="text-sm text-gray-500">Step {step} of {totalSteps}</div>
+                  </div>
+                  <ProgressBar currentStep={step} totalSteps={totalSteps} />
+                  <AnimatePresence mode="wait">
+                    <motion.div key={step} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }} className="min-h-[240px]">
+                      {renderSignupStepContent()}
+                    </motion.div>
+                  </AnimatePresence>
+                  <div className="flex justify-between items-center pt-2">
+                    {step > 1 ? <Button type="button" variant="outline" onClick={handleBack} className="gap-2"><ArrowLeft className="h-4 w-4" /> Back</Button> : <div />}
+                    {step < totalSteps ? <Button type="button" onClick={handleNext} className="gap-2">Next <ArrowRight className="h-4 w-4" /></Button> : <Button type="submit" disabled={isLoading}>{isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Create Account</Button>}
+                  </div>
+                </form>
+              </Form>
+            )}
+
+            <div className="text-center text-sm text-gray-600 mt-4 pt-4 border-t">
+              {type === 'login' ? "Don't have an account? " : "Already have an account? "}
+              <button onClick={() => onSwitchType(type === 'login' ? 'signup' : 'login', userType)} className="text-primary font-medium hover:underline">{type === 'login' ? 'Sign up' : 'Login'}</button>
+              <span className="mx-2">|</span>
+              <button onClick={() => onSwitchType(type, userType === 'user' ? 'admin' : 'user')} className="text-secondary font-medium hover:underline">
+                {userType === 'user' ? `${type === 'login' ? 'Admin Login' : 'Admin Signup'}` : `${type === 'login' ? 'User Login' : 'User Signup'}`}
+              </button>
+            </div>
           </div>
         </div>
       </DialogContent>
