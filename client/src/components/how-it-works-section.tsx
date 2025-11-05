@@ -88,14 +88,12 @@ const HowItWorksSection: React.FC = () => {
                 variants={{
                   active: {
                     scale: 1.05,
-                    opacity: 1,
                     borderColor: "hsl(var(--primary))",
                     backgroundColor: "hsl(var(--background))",
                     boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
                   },
                   inactive: {
                     scale: 1,
-                    opacity: 0.7,
                     borderColor: "transparent",
                     backgroundColor: "transparent",
                     boxShadow: "0 0 #0000",
@@ -113,8 +111,13 @@ const HowItWorksSection: React.FC = () => {
                 >
                   <step.icon className="w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                <p className="text-gray-600 px-2 text-sm">{step.description}</p>
+                <motion.div
+                  animate={{ opacity: activeIndex === index ? 1 : 0.7 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                  <p className="text-gray-600 px-2 text-sm">{step.description}</p>
+                </motion.div>
               </motion.div>
             ))}
           </div>
