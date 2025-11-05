@@ -65,7 +65,7 @@ const HeroSection: React.FC = () => {
             animate="visible"
           >
             <motion.h1
-              className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl leading-tight mb-6"
+              className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl leading-tight mb-6 text-shine"
               variants={itemVariants}
             >
               Transforming Our Cities, <br />

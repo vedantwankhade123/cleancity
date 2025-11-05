@@ -100,21 +100,15 @@ const Navbar: React.FC<NavbarProps> = ({
       : "bg-white/80 backdrop-blur-lg border-b border-gray-200/80 shadow-sm py-2"
   );
 
-  const linkClass = (path: string) => cn(
-    "transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100",
-    location === path && !(isHomePage && !scrolled) && "bg-gray-100 text-primary"
+  const isFloatingNav = scrolled || !isHomePage;
+
+  const floatingLinkClass = (path: string) => cn(
+    "transition-colors duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100",
+    location === path && "bg-primary text-white hover:bg-primary/90"
   );
 
-  const buttonClass = cn(
-    "transition-all duration-300 hover:scale-105",
-    "border-primary text-primary hover:bg-primary hover:text-white"
-  );
-
-  const primaryButtonClass = cn(
-    "transition-all duration-300 hover:scale-105",
-    (isHomePage && !scrolled)
-      ? "bg-white text-primary hover:bg-gray-200"
-      : "bg-primary text-white hover:bg-primary-dark"
+  const standardLinkClass = (path: string) => cn(
+    "transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary"
   );
 
   const navLinks = [
@@ -129,24 +123,30 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       <header className={navbarClass}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold transition-transform hover:scale-105">
+            <Link href="/" className="text-2xl font-bold transition-transform hover:scale-105 z-10">
               <span className="text-primary">Clean</span>
               <span className="text-secondary">City</span>
             </Link>
 
-            <nav className="hidden md:flex space-x-2 items-center">
-              {navLinks.map(link => (
-                link.type === 'link' ? (
-                  <Link key={link.href} href={link.href} className={linkClass(link.href)}>{link.label}</Link>
-                ) : (
-                  <button key={link.href} onClick={() => handleNavigation(link.href)} className={linkClass(link.href)}>{link.label}</button>
-                )
-              ))}
-            </nav>
+            {/* Centered Navigation */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
+              <nav className={cn(
+                "flex items-center space-x-1 transition-all duration-300",
+                isFloatingNav && "bg-white/90 backdrop-blur-md border border-gray-200/90 shadow-sm rounded-full p-1.5"
+              )}>
+                {navLinks.map(link => (
+                  link.type === 'link' ? (
+                    <Link key={link.href} href={link.href} className={isFloatingNav ? floatingLinkClass(link.href) : standardLinkClass(link.href)}>{link.label}</Link>
+                  ) : (
+                    <button key={link.href} onClick={() => handleNavigation(link.href)} className={isFloatingNav ? floatingLinkClass(link.href) : standardLinkClass(link.href)}>{link.label}</button>
+                  )
+                ))}
+              </nav>
+            </div>
 
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden md:flex items-center space-x-2 z-10">
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <DropdownMenu>
@@ -189,13 +189,13 @@ const Navbar: React.FC<NavbarProps> = ({
                 </div>
               ) : (
                 <>
-                  <Button variant="outline" className={buttonClass} onClick={() => handleOpenLoginModal("user")}>Login</Button>
-                  <Button className={primaryButtonClass} onClick={() => handleOpenSignupModal("user")}>Sign Up</Button>
+                  <Button variant="outline" className="transition-all duration-300 hover:scale-105 border-primary text-primary hover:bg-primary hover:text-white" onClick={() => handleOpenLoginModal("user")}>Login</Button>
+                  <Button className="transition-all duration-300 hover:scale-105 bg-primary text-white hover:bg-primary-dark" onClick={() => handleOpenSignupModal("user")}>Sign Up</Button>
                 </>
               )}
             </div>
 
-            <div className="md:hidden">
+            <div className="md:hidden z-10">
               <Button variant="ghost" size="icon" onClick={toggleMenu}>
                 <Menu className="h-6 w-6 text-gray-700" />
               </Button>
