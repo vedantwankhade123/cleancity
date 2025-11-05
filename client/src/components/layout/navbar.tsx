@@ -100,15 +100,9 @@ const Navbar: React.FC<NavbarProps> = ({
       : "bg-white/80 backdrop-blur-lg border-b border-gray-200/80 shadow-sm py-2"
   );
 
-  const isFloatingNav = scrolled || !isHomePage;
-
   const floatingLinkClass = (path: string) => cn(
     "transition-colors duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100",
     location === path && "bg-primary text-white hover:bg-primary/90"
-  );
-
-  const standardLinkClass = (path: string) => cn(
-    "transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary"
   );
 
   const navLinks = [
@@ -132,15 +126,12 @@ const Navbar: React.FC<NavbarProps> = ({
 
             {/* Centered Navigation */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
-              <nav className={cn(
-                "flex items-center space-x-1 transition-all duration-300",
-                isFloatingNav && "bg-white/90 backdrop-blur-md border border-gray-200/90 shadow-sm rounded-full p-1.5"
-              )}>
+              <nav className="flex items-center space-x-1 transition-all duration-300 bg-white/90 backdrop-blur-md border border-gray-200/90 shadow-sm rounded-full p-1.5">
                 {navLinks.map(link => (
                   link.type === 'link' ? (
-                    <Link key={link.href} href={link.href} className={isFloatingNav ? floatingLinkClass(link.href) : standardLinkClass(link.href)}>{link.label}</Link>
+                    <Link key={link.href} href={link.href} className={floatingLinkClass(link.href)}>{link.label}</Link>
                   ) : (
-                    <button key={link.href} onClick={() => handleNavigation(link.href)} className={isFloatingNav ? floatingLinkClass(link.href) : standardLinkClass(link.href)}>{link.label}</button>
+                    <button key={link.href} onClick={() => handleNavigation(link.href)} className={floatingLinkClass(link.href)}>{link.label}</button>
                   )
                 ))}
               </nav>
