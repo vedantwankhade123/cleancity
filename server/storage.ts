@@ -55,6 +55,10 @@ export interface IStorage {
   getPendingAdminRequestsByCity(city: string): Promise<AdminRequest[]>;
   getPendingAdminRequestsByLocation(city: string, state: string, pincode: string): Promise<AdminRequest[]>;
   updateAdminRequestStatus(id: number, status: "approved" | "rejected"): Promise<AdminRequest | undefined>;
+
+  // Notification operations
+  getAdminNotifications(city: string): Promise<Report[]>;
+  getUserNotifications(userId: number): Promise<Report[]>;
 }
 
 // In-memory storage implementation (for reference/testing)
@@ -96,6 +100,15 @@ export class MemStorage implements IStorage {
       return request;
     }
     return undefined;
+  }
+  
+  async getAdminNotifications(city: string): Promise<Report[]> {
+    // Mock implementation
+    return [];
+  }
+  async getUserNotifications(userId: number): Promise<Report[]> {
+    // Mock implementation
+    return [];
   }
   // ... (rest of MemStorage implementation)
 }

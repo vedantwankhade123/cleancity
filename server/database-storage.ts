@@ -15,7 +15,7 @@ import {
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { db } from "./db";
-import { eq, and, like, inArray, count } from "drizzle-orm";
+import { eq, and, like, inArray, count, desc } from "drizzle-orm";
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
@@ -280,6 +280,35 @@ export class DatabaseStorage implements IStorage {
       .where(eq(adminRequests.id, id))
       .returning();
     return result[0];
+  }
+
+  // Notification operations
+  async getAdminNotifications(city: string): Promise<Report[]> {
+    const usersInCity = await this.getUsersByCity(city);
+    const userIds = usersInCity.map((user) => user.id);
+
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return await db
+      .select()
+      .from(reports)
+      .where(and(
+        inArray(reports.userId, userIds),
+        eq(reports.status, 'pending')
+      ))
+      .orderBy(desc(reports.createdAt))
+      .limit(5);
+  }
+
+  async getUserNotifications(userId: number): Promise<Report[]> {
+    return await db
+      .select()
+      .from(reports)
+      .where(eq(reports.userId, userId))
+      .orderBy(desc(reports.updatedAt))
+      .limit(5);
   }
 }
 

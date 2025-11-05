@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { AnimatePresence, motion } from "framer-motion";
+import { timeAgo } from "@/lib/utils";
 
 interface NavbarProps {
   setShowLoginModal: (show: boolean) => void;
@@ -25,6 +26,7 @@ interface Notification {
   id: string;
   message: string;
   timestamp: string;
+  link: string;
 }
 
 const navLinks = [
@@ -196,7 +198,7 @@ const Navbar: React.FC<NavbarProps> = ({
                       <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
                         <Bell className="h-5 w-5" />
                         {notifications && notifications.length > 0 && (
-                          <span className="absolute top-1 right-1 bg-accent text-white rounded-full w-4 h-4 text-xs flex items-center justify-center" />
+                          <span className="absolute top-1.5 right-1.5 bg-accent text-white rounded-full w-2 h-2" />
                         )}
                       </Button>
                     </DropdownMenuTrigger>
@@ -206,10 +208,12 @@ const Navbar: React.FC<NavbarProps> = ({
                       <div className="p-2 max-h-60 overflow-y-auto">
                         {isLoadingNotifications ? <div className="flex justify-center p-4"><Loader2 className="h-5 w-5 animate-spin" /></div> :
                          notifications && notifications.length > 0 ? notifications.map(n => (
-                           <div key={n.id} className="p-2 rounded-md hover:bg-gray-100 text-sm">
-                             <p className="font-medium">{n.message}</p>
-                             <p className="text-xs text-gray-500 mt-1">{new Date(n.timestamp).toLocaleString()}</p>
-                           </div>
+                           <Link href={n.link} key={n.id}>
+                             <a className="block p-2 rounded-md hover:bg-gray-100 text-sm cursor-pointer">
+                               <p className="font-medium">{n.message}</p>
+                               <p className="text-xs text-gray-500 mt-1">{timeAgo(n.timestamp)}</p>
+                             </a>
+                           </Link>
                          )) : <div className="text-center text-sm text-gray-500 p-4">No new notifications</div>}
                       </div>
                     </DropdownMenuContent>

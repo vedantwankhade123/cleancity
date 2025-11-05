@@ -643,6 +643,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Notification routes
+  // -------------------
+  apiRouter.get("/notifications", requireAuth, async (req, res) => {
+    try {
+      let notifications: any[] = [];
+      if (req.session.role === 'admin') {
+        const recentReports = await storage.getAdminNotifications(req.session.city!);
+        notifications = recentReports.map(report => ({
+          id: `report-${report.id}`,
+          message: `New report: "${report.title}"`,
+          timestamp: report.createdAt,
+          link: `/admin/reports?id=${report.id}`
+        }));
+      } else {
+        const userReports = await storage.getUserNotifications(req.session.userId!);
+        notifications = userReports.map(report => ({
+          id: `report-update-${report.id}`,
+          message: `Report "${report.title}" status is now ${report.status}.`,
+          timestamp: report.updatedAt,
+          link: `/user/reports`
+        }));
+      }
+      res.json(notifications);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

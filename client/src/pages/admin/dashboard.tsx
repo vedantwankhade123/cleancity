@@ -15,6 +15,7 @@ import {
   User,
   Users,
   Activity,
+  Bell,
 } from "lucide-react";
 import { Report, User as UserType } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
@@ -27,6 +28,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange, DayContent, type DayContentProps } from "react-day-picker";
 import { format } from "date-fns";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { apiRequest } from "@/lib/queryClient";
+
+interface Notification {
+  id: string;
+  message: string;
+  timestamp: string;
+  link: string;
+}
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -51,6 +61,18 @@ const AdminDashboard: React.FC = () => {
   } = useQuery<UserType[]>({
     queryKey: ["/api/users"],
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Fetch notifications
+  const { data: notifications, isLoading: isLoadingNotifications } = useQuery<Notification[]>({
+    queryKey: ['notifications', user?.id],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/notifications`);
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+      return await response.json() as Notification[];
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 1, // refetch every minute
   });
 
   // Process reports to create a map of events by date
@@ -171,7 +193,7 @@ const AdminDashboard: React.FC = () => {
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2 w-[240px] justify-start text-left font-normal">
@@ -205,6 +227,38 @@ const AdminDashboard: React.FC = () => {
                       />
                     </PopoverContent>
                   </Popover>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
+                        <Bell className="h-5 w-5" />
+                        {notifications && notifications.length > 0 && (
+                          <span className="absolute top-1.5 right-1.5 bg-red-500 text-white rounded-full w-2 h-2" />
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-80">
+                      <div className="p-2 font-medium">Notifications</div>
+                      <DropdownMenuSeparator />
+                      <div className="p-2 max-h-60 overflow-y-auto">
+                        {isLoadingNotifications ? (
+                          <div className="flex justify-center p-4"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                        ) : notifications && notifications.length > 0 ? (
+                          notifications.map(n => (
+                            <Link href={n.link} key={n.id}>
+                              <a className="block p-2 rounded-md hover:bg-gray-100 text-sm cursor-pointer">
+                                <p className="font-medium">{n.message}</p>
+                                <p className="text-xs text-gray-500 mt-1">{timeAgo(n.timestamp)}</p>
+                              </a>
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="text-center text-sm text-gray-500 p-4">No new notifications</div>
+                        )}
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       <User className="h-4 w-4" />
