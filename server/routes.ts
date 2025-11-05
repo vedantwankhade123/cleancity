@@ -95,7 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // --------------------
 
   // Check if an admin exists for a city
-  app.get("/api/auth/check-admin", async (req, res) => {
+  apiRouter.get("/auth/check-admin", async (req, res) => {
     const city = req.query.city as string;
     if (!city) {
       return res.status(400).json({ message: "City query parameter is required." });
@@ -110,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User registration
-  app.post("/api/auth/register", async (req, res) => {
+  apiRouter.post("/auth/register", async (req, res) => {
     const validation = validateRequest(insertUserSchema, req.body);
     
     if (!validation.success) {
@@ -189,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // User login
-  app.post("/api/auth/login", async (req, res) => {
+  apiRouter.post("/auth/login", async (req, res) => {
     const validation = validateRequest(loginSchema, req.body);
     
     if (!validation.success) {
@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // User logout
-  app.post("/api/auth/logout", (req, res) => {
+  apiRouter.post("/auth/logout", (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         return res.status(500).json({ message: "Logout failed" });
@@ -241,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get current user
-  app.get("/api/auth/me", async (req, res) => {
+  apiRouter.get("/auth/me", async (req, res) => {
     console.log("GET /api/auth/me - Session:", req.session);
     
     if (!req.session.userId) {
@@ -276,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin Request Routes
   // --------------------
-  app.get("/api/admin-requests", requireAdmin, async (req, res) => {
+  apiRouter.get("/admin-requests", requireAdmin, async (req, res) => {
     try {
       const requests = await storage.getPendingAdminRequestsByCity(req.session.city!);
       res.json(requests);
@@ -285,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin-requests/:id/approve", requireAdmin, async (req, res) => {
+  apiRouter.post("/admin-requests/:id/approve", requireAdmin, async (req, res) => {
     const requestId = parseInt(req.params.id);
     try {
       const cityAdmins = await storage.getUsersByCity(req.session.city!);
@@ -322,7 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin-requests/:id/reject", requireAdmin, async (req, res) => {
+  apiRouter.post("/admin-requests/:id/reject", requireAdmin, async (req, res) => {
     const requestId = parseInt(req.params.id);
     try {
       const cityAdmins = await storage.getUsersByCity(req.session.city!);
@@ -343,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // -------------
   
   // Get all reports (filtered by user role)
-  app.get("/api/reports", requireAuth, async (req, res) => {
+  apiRouter.get("/reports", requireAuth, async (req, res) => {
     try {
       let reports;
       
@@ -363,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get a specific report by ID
-  app.get("/api/reports/:id", requireAuth, async (req, res) => {
+  apiRouter.get("/reports/:id", requireAuth, async (req, res) => {
     const reportId = parseInt(req.params.id);
     
     if (isNaN(reportId)) {
@@ -390,7 +390,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create a new report
-  app.post("/api/reports", requireAuth, async (req, res) => {
+  apiRouter.post("/reports", requireAuth, async (req, res) => {
     console.log("Received report data:", req.body);
     console.log("User session:", { userId: req.session.userId, role: req.session.role });
     
@@ -421,7 +421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update report status (admin only)
-  app.patch("/api/reports/:id/status", requireAdmin, async (req, res) => {
+  apiRouter.patch("/reports/:id/status", requireAdmin, async (req, res) => {
     const reportId = parseInt(req.params.id);
     
     if (isNaN(reportId)) {
@@ -459,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ----------------------------------
   
   // Get all users (admin only)
-  app.get("/api/users", requireAdmin, async (req, res) => {
+  apiRouter.get("/users", requireAdmin, async (req, res) => {
     try {
       const users = await storage.getUsersByCity(req.session.city || "");
       
@@ -477,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update user (admin or self)
-  app.patch("/api/users/:id", requireAuth, async (req, res) => {
+  apiRouter.patch("/users/:id", requireAuth, async (req, res) => {
     const userId = parseInt(req.params.id);
     
     if (isNaN(userId)) {
@@ -528,7 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete user (admin only)
-  app.delete("/api/users/:id", requireAdmin, async (req, res) => {
+  apiRouter.delete("/users/:id", requireAdmin, async (req, res) => {
     const userId = parseInt(req.params.id);
     
     if (isNaN(userId)) {
