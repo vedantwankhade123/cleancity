@@ -68,8 +68,7 @@ const HeroSection: React.FC = () => {
               className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl leading-tight mb-6 text-shine"
               variants={itemVariants}
             >
-              Transforming Our Cities, <br />
-              <span className="gradient-text">Together.</span>
+              Transforming Our Cities <span className="gradient-text">Together.</span>
             </motion.h1>
             <motion.p
               className="text-lg text-gray-600 mb-10 max-w-lg"
