@@ -113,9 +113,9 @@ const adminStepConfig = [
     fields: ['city', 'state', 'pincode'],
   },
   {
-    title: 'Verification & Terms',
+    title: 'Terms',
     icon: <ShieldCheck className='h-5 w-5' />,
-    fields: ['secretCode', 'termsAccepted'],
+    fields: ['termsAccepted'],
   },
 ]
 
@@ -507,30 +507,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
             <div className='space-y-4'>
               <FormField
                 control={signupForm.control}
-                name='secretCode'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Admin Secret Code</FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                        <Input
-                          placeholder='Enter secret code'
-                          {...field}
-                          required
-                          className='pl-10'
-                        />
-                      </div>
-                    </FormControl>
-                    <p className='text-xs text-gray-500 mt-1'>
-                      This code is provided by the system manager.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={signupForm.control}
                 name='termsAccepted'
                 render={({ field }) => (
                   <FormItem className='flex items-start space-x-2 space-y-0 pt-2'>
@@ -844,7 +820,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         {isLoading && (
                           <Loader2 className='h-4 w-4 animate-spin mr-2' />
                         )}
-                        Create Account
+                        {userType === 'admin' ? 'Submit Request' : 'Create Account'}
                       </Button>
                     )}
                   </div>

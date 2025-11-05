@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   X,
+  UserCheck,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -74,6 +75,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
       href: "/admin/users",
       label: "User Management",
       icon: <Users className="w-5 h-5 mr-3" />,
+    },
+    {
+      href: "/admin/requests",
+      label: "Admin Requests",
+      icon: <UserCheck className="w-5 h-5 mr-3" />,
     },
     {
       href: "/admin/profile",

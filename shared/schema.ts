@@ -18,18 +18,39 @@ export const users = pgTable("users", {
   secretCode: text("secret_code"),
   isActive: boolean("is_active").notNull().default(true),
   rewardPoints: integer("reward_points").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   isActive: true,
   rewardPoints: true,
+  createdAt: true,
 });
 
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   role: z.enum(["user", "admin"]),
+});
+
+// Admin Request Schema
+export const adminRequests = pgTable("admin_requests", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pincode: text("pincode").notNull(),
+  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected"
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertAdminRequestSchema = createInsertSchema(adminRequests).omit({
+  id: true,
+  status: true,
+  createdAt: true,
 });
 
 // Admin Secret Code schema
@@ -84,6 +105,9 @@ export const updateReportStatusSchema = z.object({
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Login = z.infer<typeof loginSchema>;
+
+export type AdminRequest = typeof adminRequests.$inferSelect;
+export type InsertAdminRequest = z.infer<typeof insertAdminRequestSchema>;
 
 export type AdminSecretCode = typeof adminSecretCodes.$inferSelect;
 export type InsertAdminSecretCode = z.infer<typeof insertAdminSecretCodeSchema>;

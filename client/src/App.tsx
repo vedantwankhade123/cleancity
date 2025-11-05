@@ -17,6 +17,7 @@ const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
 const AdminReports = lazy(() => import("@/pages/admin/reports"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminProfile = lazy(() => import("@/pages/admin/profile"));
+const AdminRequests = lazy(() => import("@/pages/admin/requests"));
 const AirQuality = lazy(() => import("@/pages/air-quality"));
 
 function LoadingSpinner() {
@@ -143,6 +144,9 @@ function Router() {
         </Route>
         <Route path="/admin/profile">
           <ProtectedRoute component={AdminProfile} requiredRole="admin" />
+        </Route>
+        <Route path="/admin/requests">
+          <ProtectedRoute component={AdminRequests} requiredRole="admin" />
         </Route>
 
         {/* Fallback to 404 */}

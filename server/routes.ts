@@ -5,7 +5,8 @@ import {
   insertUserSchema, 
   loginSchema, 
   insertReportSchema, 
-  updateReportStatusSchema
+  updateReportStatusSchema,
+  insertAdminRequestSchema
 } from "@shared/schema";
 import airQualityRouter from "./routes/air-quality";
 import { ZodError } from "zod";
@@ -110,42 +111,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email already registered" });
       }
       
-      // For admin registration
+      // Hash password
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
+      // For admin registration, create a request instead of a user
       if (userData.role === "admin") {
-        // Validate secret code
-        if (!userData.secretCode) {
-          return res.status(400).json({ message: "Secret code is required for admin registration" });
-        }
-        
-        const secretCode = await storage.getAdminSecretCode(userData.secretCode);
-        if (!secretCode) {
-          return res.status(403).json({ message: "Authorization failed. Please enter a valid secret code or sign up as a user." });
-        }
-        
-        if (secretCode.isUsed) {
-          return res.status(400).json({ message: "Secret code has already been used" });
-        }
-        
-        // Ensure city matches secret code city
-        if (secretCode.city.toLowerCase() !== userData.city.toLowerCase()) {
-          return res.status(400).json({ message: "Secret code is not valid for this city" });
-        }
-        
-        // Check admin limit (2 per city)
         const adminCount = await storage.getUserAdminsCountByCity(userData.city);
-        if (adminCount >= 2) {
+        if (adminCount >= 5) {
           return res.status(400).json({ message: "Maximum number of admins reached for this city" });
         }
         
-        // Mark secret code as used
-        await storage.markAdminSecretCodeAsUsed(secretCode.id);
+        const adminRequestData = {
+          fullName: userData.fullName,
+          email: userData.email,
+          password: hashedPassword,
+          city: userData.city,
+          state: userData.state,
+          pincode: userData.pincode,
+        };
+        
+        await storage.createAdminRequest(adminRequestData);
+        return res.status(201).json({ message: "Admin registration request submitted for approval." });
       }
       
-      // Hash password before creating user
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      // Create user for non-admin roles
       const userWithHashedPassword = { ...userData, password: hashedPassword };
-      
-      // Create user
       const user = await storage.createUser(userWithHashedPassword);
       
       // Set session
@@ -245,6 +235,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get current user error:", error);
       res.status(500).json({ message: "Failed to get user data" });
+    }
+  });
+
+  // Admin Request Routes
+  // --------------------
+  app.get("/api/admin-requests", requireAdmin, async (req, res) => {
+    try {
+      const requests = await storage.getPendingAdminRequestsByCity(req.session.city!);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch admin requests" });
+    }
+  });
+
+  app.post("/api/admin-requests/:id/approve", requireAdmin, async (req, res) => {
+    const requestId = parseInt(req.params.id);
+    try {
+      const cityAdmins = await storage.getUsersByCity(req.session.city!);
+      const superAdmin = cityAdmins.filter(u => u.role === 'admin').sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+
+      if (req.session.userId !== superAdmin.id) {
+        return res.status(403).json({ message: "Only the superadmin can approve requests." });
+      }
+
+      const request = await storage.getAdminRequestById(requestId);
+      if (!request || request.city !== req.session.city) {
+        return res.status(404).json({ message: "Request not found." });
+      }
+
+      const adminCount = await storage.getUserAdminsCountByCity(request.city);
+      if (adminCount >= 5) {
+        return res.status(400).json({ message: "Maximum number of admins reached for this city" });
+      }
+
+      await storage.createUser({
+        fullName: request.fullName,
+        email: request.email,
+        password: request.password,
+        city: request.city,
+        state: request.state,
+        pincode: request.pincode,
+        role: 'admin',
+      });
+
+      await storage.updateAdminRequestStatus(requestId, 'approved');
+      res.json({ message: "Admin request approved." });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to approve request." });
+    }
+  });
+
+  app.post("/api/admin-requests/:id/reject", requireAdmin, async (req, res) => {
+    const requestId = parseInt(req.params.id);
+    try {
+      const cityAdmins = await storage.getUsersByCity(req.session.city!);
+      const superAdmin = cityAdmins.filter(u => u.role === 'admin').sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+
+      if (req.session.userId !== superAdmin.id) {
+        return res.status(403).json({ message: "Only the superadmin can reject requests." });
+      }
+      
+      await storage.updateAdminRequestStatus(requestId, 'rejected');
+      res.json({ message: "Admin request rejected." });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to reject request." });
     }
   });
   
