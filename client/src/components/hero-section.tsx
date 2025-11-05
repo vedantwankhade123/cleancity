@@ -3,7 +3,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import AuthModal from "@/components/dialogs/auth-modal";
 import { useLocation } from "wouter";
-import { TypingAnimation } from "@/components/ui/typing-animation";
+import { motion } from "framer-motion";
+import { ArrowRight, Flag, CheckCircle, Award } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -30,59 +31,103 @@ const HeroSection: React.FC = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <section id="home" className="relative">
-      <div 
-        className="relative min-h-[96.5vh] flex flex-col items-center justify-center rounded-[40px] overflow-hidden pt-24 pb-12 m-[10px]"
+    <section id="home" className="relative w-full">
+      <div
+        className="relative min-h-screen flex items-center rounded-[40px] overflow-hidden m-[10px]"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=1920&h=1080')",
-          backgroundSize: "cover", 
+          backgroundImage: "url('https://images.unsplash.com/photo-1618223245121-F1318aa24a2e?auto=format&fit=crop&q=80&w=1920&h=1080')",
+          backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundAttachment: "fixed"
         }}
       >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50" />
-        
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl mb-6 min-h-[4.5rem] md:min-h-[5.5rem] flex items-center justify-center">
-              <TypingAnimation 
-                texts={[
-                  "Keep Your City Clean & Green",
-                  "Report Waste, Make a Difference",
-                  "Join CleanCity",
-                  "Together for a Cleaner Tomorrow"
-                ]}
-                transitionDuration={800}
-                displayDuration={3000}
-                className="text-center"
-                cursorClassName="bg-white"
-                textClassName="text-white"
-                showCursor={false}
-              />
-            </h1>
-            <p className="text-xl text-white/90 mb-8">
-              Join our community effort to identify and clean up waste in your neighborhood. Report waste, earn rewards, and make a difference.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={handleReportWaste} 
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            className="max-w-2xl text-left"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.h1
+              className="text-4xl font-extrabold text-white sm:text-5xl md:text-6xl leading-tight mb-6"
+              variants={itemVariants}
+            >
+              Transforming Our Cities, <br />
+              <span className="gradient-text">Together.</span>
+            </motion.h1>
+            <motion.p
+              className="text-lg text-white/90 mb-10 max-w-lg"
+              variants={itemVariants}
+            >
+              Be a part of the change. Spot, report, and resolve cleanliness
+              issues in your community with CleanCity.
+            </motion.p>
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4"
+              variants={itemVariants}
+            >
+              <Button
+                onClick={handleReportWaste}
                 size="lg"
-                className="px-6 py-6 bg-accent hover:bg-accent-dark text-white text-lg font-medium"
+                className="px-8 py-6 bg-primary hover:bg-primary-dark text-white text-lg font-semibold shadow-lg transition-transform hover:scale-105"
               >
-                Report Waste
+                Get Started <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 onClick={handleAdminLogin}
-                variant="secondary"
+                variant="outline"
                 size="lg"
-                className="px-6 py-6 bg-white/20 backdrop-blur-sm text-white border border-white hover:bg-white/30 text-lg font-medium"
+                className="px-8 py-6 bg-white/10 backdrop-blur-sm text-white border-white/50 hover:bg-white/20 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
               >
                 Admin Login
               </Button>
-            </div>
-          </div>
+            </motion.div>
+
+            <motion.div
+              className="mt-16 flex flex-col sm:flex-row items-start sm:items-center gap-6 text-white/90"
+              variants={itemVariants}
+            >
+              <div className="flex items-center gap-3">
+                <Flag className="h-6 w-6 text-accent" />
+                <span className="font-medium">Report Issues</span>
+              </div>
+              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-accent" />
+                <span className="font-medium">Track Progress</span>
+              </div>
+              <div className="hidden sm:block h-6 w-px bg-white/30"></div>
+              <div className="flex items-center gap-3">
+                <Award className="h-6 w-6 text-accent" />
+                <span className="font-medium">Earn Rewards</span>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
 
@@ -92,10 +137,10 @@ const HeroSection: React.FC = () => {
         onClose={() => setShowLoginModal(false)}
         type="login"
         userType={authType}
-        onSwitchType={(type) => {
+        onSwitchType={(type, userType) => {
           setShowLoginModal(false);
           setShowSignupModal(true);
-          setAuthType(type);
+          setAuthType(userType);
         }}
       />
 
@@ -104,10 +149,10 @@ const HeroSection: React.FC = () => {
         onClose={() => setShowSignupModal(false)}
         type="signup"
         userType={authType}
-        onSwitchType={(type) => {
+        onSwitchType={(type, userType) => {
           setShowSignupModal(false);
           setShowLoginModal(true);
-          setAuthType(type);
+          setAuthType(userType);
         }}
       />
     </section>
