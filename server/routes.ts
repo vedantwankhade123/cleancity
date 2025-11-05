@@ -119,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         const secretCode = await storage.getAdminSecretCode(userData.secretCode);
         if (!secretCode) {
-          return res.status(400).json({ message: "Invalid secret code" });
+          return res.status(403).json({ message: "Authorization failed. Please enter a valid secret code or sign up as a user." });
         }
         
         if (secretCode.isUsed) {

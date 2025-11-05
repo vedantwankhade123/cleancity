@@ -207,7 +207,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
       })
       handleClose()
     } catch (err: any) {
-      setError(err.message || 'Failed to login.')
+      let errorMessage = 'Failed to login.';
+      try {
+        const errorJson = JSON.parse(err.message);
+        errorMessage = errorJson.message || errorMessage;
+      } catch (e) {
+        errorMessage = err.message || errorMessage;
+      }
+      setError(errorMessage);
     }
   }
 
@@ -218,7 +225,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
       await register({ ...registerData, role: userType })
       handleClose()
     } catch (err: any) {
-      setError(err.message || 'Failed to register.')
+      let errorMessage = 'Failed to register.';
+      try {
+        const errorJson = JSON.parse(err.message);
+        errorMessage = errorJson.message || errorMessage;
+      } catch (e) {
+        errorMessage = err.message || errorMessage;
+      }
+      setError(errorMessage);
     }
   }
 
