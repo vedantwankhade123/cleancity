@@ -113,9 +113,9 @@ const adminStepConfig = [
     fields: ['city', 'state', 'pincode'],
   },
   {
-    title: 'Terms',
+    title: 'Verification & Terms',
     icon: <ShieldCheck className='h-5 w-5' />,
-    fields: ['termsAccepted'],
+    fields: ['secretCode', 'termsAccepted'],
   },
 ]
 
@@ -505,6 +505,29 @@ const AuthModal: React.FC<AuthModalProps> = ({
         if (userType === 'admin') {
           return (
             <div className='space-y-4'>
+              <FormField
+                control={signupForm.control}
+                name='secretCode'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Secret Code</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                        <Input
+                          placeholder='Enter secret code (if you are the first admin)'
+                          {...field}
+                          className='pl-10'
+                        />
+                      </div>
+                    </FormControl>
+                    <p className='text-xs text-gray-500 mt-1'>
+                      Only required for the first admin of a city. Subsequent admins will be approved.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={signupForm.control}
                 name='termsAccepted'

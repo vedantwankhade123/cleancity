@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { User, Login } from "@shared/schema";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/hooks/use-toast";
 
 interface RegisterData {
   fullName: string;
@@ -92,34 +93,37 @@ export function useAuth() {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      console.log("Registering user:", { 
-        email: userData.email, 
-        role: userData.role, 
-        city: userData.city 
-      });
-      
       const res = await apiRequest("POST", "/api/auth/register", userData);
-      
       if (!res.ok) {
-        console.error("Registration failed:", res.status, res.statusText);
         const errorText = await res.text();
         throw new Error(errorText || "Registration failed");
       }
-      
       return res.json();
     },
     onSuccess: (data) => {
-      console.log("Registration successful:", { id: data.id, role: data.role });
-      queryClient.setQueryData(["/api/auth/me"], data);
-      
-      // Invalidate the current user query to force a refetch
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      
-      // Redirect to appropriate dashboard
-      if (data.role === "admin") {
-        window.location.href = "/admin/dashboard";
-      } else {
-        window.location.href = "/user/dashboard";
+      // If data contains a user object, it was a direct signup
+      if (data.id && data.role) {
+        queryClient.setQueryData(["/api/auth/me"], data);
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        
+        toast({
+          title: "Registration Successful",
+          description: "Welcome to CleanCity!",
+        });
+
+        // Redirect to appropriate dashboard
+        if (data.role === "admin") {
+          window.location.href = "/admin/dashboard";
+        } else {
+          window.location.href = "/user/dashboard";
+        }
+      } 
+      // If data contains a message, it was an admin request
+      else if (data.message) {
+        toast({
+          title: "Request Submitted",
+          description: data.message,
+        });
       }
     },
     onError: (error: any) => {

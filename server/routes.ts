@@ -105,47 +105,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userData = validation.data!;
     
     try {
-      // Check if email already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
         return res.status(400).json({ message: "Email already registered" });
       }
       
-      // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       
-      // For admin registration, create a request instead of a user
       if (userData.role === "admin") {
         const adminCount = await storage.getUserAdminsCountByCity(userData.city);
-        if (adminCount >= 5) {
-          return res.status(400).json({ message: "Maximum number of admins reached for this city" });
+        
+        // Case 1: First admin for the city
+        if (adminCount === 0) {
+          if (!userData.secretCode) {
+            return res.status(400).json({ message: "Secret code is required for the first admin of a city." });
+          }
+          
+          const secretCode = await storage.getAdminSecretCode(userData.secretCode);
+          if (!secretCode || secretCode.isUsed || secretCode.city.toLowerCase() !== userData.city.toLowerCase()) {
+            return res.status(403).json({ message: "Invalid or used secret code for this city." });
+          }
+          
+          // Create admin user directly
+          const user = await storage.createUser({ ...userData, password: hashedPassword });
+          await storage.markAdminSecretCodeAsUsed(secretCode.id);
+          
+          req.session.userId = user.id;
+          req.session.role = user.role;
+          req.session.city = user.city;
+          
+          const { password, ...userWithoutPassword } = user;
+          return res.status(201).json(userWithoutPassword);
+        } 
+        // Case 2: Subsequent admins for the city
+        else {
+          if (adminCount >= 5) {
+            return res.status(400).json({ message: "Maximum number of admins reached for this city." });
+          }
+          
+          // Create an admin request
+          await storage.createAdminRequest({
+            fullName: userData.fullName,
+            email: userData.email,
+            password: hashedPassword,
+            city: userData.city,
+            state: userData.state,
+            pincode: userData.pincode,
+          });
+          
+          return res.status(201).json({ message: "Admin registration request submitted for approval." });
         }
+      } 
+      // Case 3: Regular user registration
+      else {
+        const user = await storage.createUser({ ...userData, password: hashedPassword });
         
-        const adminRequestData = {
-          fullName: userData.fullName,
-          email: userData.email,
-          password: hashedPassword,
-          city: userData.city,
-          state: userData.state,
-          pincode: userData.pincode,
-        };
+        req.session.userId = user.id;
+        req.session.role = user.role;
+        req.session.city = user.city;
         
-        await storage.createAdminRequest(adminRequestData);
-        return res.status(201).json({ message: "Admin registration request submitted for approval." });
+        const { password, ...userWithoutPassword } = user;
+        return res.status(201).json(userWithoutPassword);
       }
-      
-      // Create user for non-admin roles
-      const userWithHashedPassword = { ...userData, password: hashedPassword };
-      const user = await storage.createUser(userWithHashedPassword);
-      
-      // Set session
-      req.session.userId = user.id;
-      req.session.role = user.role;
-      req.session.city = user.city;
-      
-      // Return user data excluding password
-      const { password, ...userWithoutPassword } = user;
-      res.status(201).json(userWithoutPassword);
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });
