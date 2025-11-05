@@ -175,12 +175,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    mode: 'onTouched',
     defaultValues: { email: '', password: '', rememberMe: false },
   })
   const signupForm = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    mode: 'onTouched',
     defaultValues: {
       fullName: '',
       email: '',
