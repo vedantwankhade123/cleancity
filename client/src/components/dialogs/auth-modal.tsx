@@ -58,14 +58,14 @@ const signupSchema = z
     confirmPassword: z
       .string()
       .min(6, 'Password must be at least 6 characters'),
-    phone: z.string().min(10, 'Phone number must be at least 10 characters').optional(),
+    phone: z.string().min(10, 'Phone number must be at least 10 characters').optional().or(z.literal('')),
     dob: z
       .string()
       .refine(
         val => !val || (new Date(val) <= new Date(new Date().setFullYear(new Date().getFullYear() - 13))),
         'You must be at least 13 years old',
       ).optional(),
-    address: z.string().min(3, 'Address must be at least 3 characters').optional(),
+    address: z.string().min(3, 'Address must be at least 3 characters').optional().or(z.literal('')),
     city: z.string().min(2, 'City must be at least 2 characters'),
     state: z.string().min(2, 'State must be at least 2 characters'),
     pincode: z.string().min(5, 'Pincode must be at least 5 characters'),
