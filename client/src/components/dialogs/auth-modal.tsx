@@ -190,7 +190,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type, userType, 
             <img
               src={type === 'login' ? '/login.png' : '/signup.png'}
               alt={type === 'login' ? 'Login illustration' : 'Signup illustration'}
-              className="absolute inset-0 w-full h-full object-contain p-4"
+              className="absolute inset-0 w-full h-full object-contain"
             />
           </div>
 
