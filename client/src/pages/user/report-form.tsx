@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { fileToBase64 } from "@/lib/utils";
-import { Image, Upload, X } from "lucide-react";
+import { Image, X, FileText, Camera, MapPin, Send } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import CameraComponent from "@/components/ui/camera";
@@ -38,7 +38,6 @@ import { Helmet } from "react-helmet";
 
 // Extended schema with file validation
 const reportFormSchema = insertReportSchema.extend({
-  // These fields will be added programmatically later
   imageFile: z.any()
     .refine(file => 
       file && (file instanceof File || typeof file === "string"), 
@@ -52,7 +51,6 @@ const ReportForm: React.FC = () => {
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const {
-    file,
     preview,
     error: fileError,
     handleFileChange,
@@ -71,7 +69,7 @@ const ReportForm: React.FC = () => {
       longitude: "",
       address: "",
       userId: user?.id || 0,
-      imageUrl: "", // Add default imageUrl field
+      imageUrl: "",
     },
   });
 
@@ -105,44 +103,26 @@ const ReportForm: React.FC = () => {
   // Create report mutation
   const createReportMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log("Submitting report with data:", data);
-      
-      // Convert image to base64 if it's a File
       let imageUrl = "";
       if (data.imageFile instanceof File) {
         imageUrl = await fileToBase64(data.imageFile);
       } else if (typeof data.imageFile === "string") {
-        // Camera capture is already a base64 string
         imageUrl = data.imageFile;
       }
       
-      // Remove imageFile and use imageUrl
       const { imageFile, ...reportData } = data;
       
-      // Log the actual data being sent to the server
-      console.log("Sending to server:", {
+      const response = await apiRequest("POST", "/api/reports", {
         ...reportData,
-        imageUrl: imageUrl.substring(0, 50) + "..." // Truncate for logging
+        imageUrl,
       });
       
-      try {
-        const response = await apiRequest("POST", "/api/reports", {
-          ...reportData,
-          imageUrl,
-        });
-        
-        // Check if response is ok
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Server error:", errorData);
-          throw new Error(errorData.message || "Failed to submit report");
-        }
-        
-        return response.json();
-      } catch (error) {
-        console.error("Report submission error:", error);
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit report");
       }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reports"] });
@@ -188,159 +168,196 @@ const ReportForm: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar />
         
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 lg:pt-28">
-          {/* Spacing adjustments: 
-             - Mobile: pt-24 (6rem) for fixed navbar
-             - Desktop: lg:pt-28 (7rem) for larger screens with fixed navbar
-             - Bottom padding: pb-8 (2rem) for consistent spacing */}
-          <Card className="max-w-4xl mx-auto">
-            <CardHeader>
-              <CardTitle>Submit New Waste Report</CardTitle>
-              <CardDescription>
-                Help keep your community clean by reporting waste in your area.
-                You'll earn reward points for verified reports.
-              </CardDescription>
-            </CardHeader>
+        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Report a Waste Issue</h1>
+              <p className="text-lg text-gray-600">
+                Help us keep your community clean. Fill out the details below.
+              </p>
+            </div>
             
-            <CardContent>
-              <Form {...form}>
-                <form 
-                  onSubmit={form.handleSubmit(onSubmit)} 
-                  className="space-y-6"
-                >
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Report Title</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Brief title for your report" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Describe the waste issue in detail..." 
-                            className="resize-none" 
-                            rows={4} 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="imageFile"
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <FormItem>
-                        <FormLabel>Upload Photos</FormLabel>
-                        <FormControl>
-                          <div className="space-y-4">
-                            {!preview ? (
-                              <div className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                                <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center pt-5 pb-6 cursor-pointer w-full h-full">
-                                  <Image className="w-10 h-10 text-gray-400 mb-3" />
-                                  <p className="mb-2 text-sm text-gray-500">
-                                    <span className="font-semibold">Click to upload</span> or drag and drop
-                                  </p>
-                                  <p className="text-xs text-gray-500">PNG, JPG or JPEG (MAX. 10MB)</p>
-                                </label>
-                                <input
-                                  id="dropzone-file"
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={handleFileInputChange}
-                                  {...field}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                  {/* Left Column: Details */}
+                  <div className="lg:col-span-3">
+                    <Card className="h-full">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-primary" />
+                          1. Describe the Issue
+                        </CardTitle>
+                        <CardDescription>
+                          Provide a clear title and a detailed description of the waste problem.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <FormField
+                          control={form.control}
+                          name="title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Report Title</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="e.g., Overflowing trash bin on Main St." 
+                                  {...field} 
                                 />
-                              </div>
-                            ) : (
-                              <div className="relative">
-                                <img
-                                  src={preview}
-                                  alt="Preview"
-                                  className="max-h-64 mx-auto rounded-md object-contain"
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Description</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Describe the waste issue in detail. Mention the type of waste, approximate quantity, and any other relevant information." 
+                                  className="resize-none" 
+                                  rows={10} 
+                                  {...field} 
                                 />
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute top-2 right-2"
-                                  onClick={handleClearImage}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            )}
-                            
-                            {!preview && (
-                              <div className="flex gap-2">
-                                <CameraComponent
-                                  onCapture={handleCameraCapture}
-                                  buttonText="Capture Photo"
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  {/* Right Column: Photo & Location */}
+                  <div className="lg:col-span-2 space-y-8">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Camera className="h-5 w-5 text-primary" />
+                          2. Add a Photo
+                        </CardTitle>
+                        <CardDescription>
+                          A clear photo helps us assess the situation better.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <FormField
+                          control={form.control}
+                          name="imageFile"
+                          render={({ field: { value, onChange, ...field } }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div className="space-y-4">
+                                  {!preview ? (
+                                    <div className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                      <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center pt-5 pb-6 cursor-pointer w-full h-full">
+                                        <Image className="w-10 h-10 text-gray-400 mb-3" />
+                                        <p className="mb-2 text-sm text-gray-500">
+                                          <span className="font-semibold">Click to upload</span> or drag & drop
+                                        </p>
+                                        <p className="text-xs text-gray-500">PNG, JPG, JPEG (MAX. 10MB)</p>
+                                      </label>
+                                      <input
+                                        id="dropzone-file"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleFileInputChange}
+                                        {...field}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="relative">
+                                      <img
+                                        src={preview}
+                                        alt="Preview"
+                                        className="w-full h-48 rounded-md object-cover"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute top-2 right-2 h-8 w-8"
+                                        onClick={handleClearImage}
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  {!preview && (
+                                    <div className="flex justify-center">
+                                      <CameraComponent onCapture={handleCameraCapture} buttonText="Capture with Camera" />
+                                    </div>
+                                  )}
+                                  {fileError && <p className="text-sm text-red-500 text-center">{fileError}</p>}
+                                </div>
+                              </FormControl>
+                              <FormMessage className="text-center pt-2" />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <MapPin className="h-5 w-5 text-primary" />
+                          3. Pin the Location
+                        </CardTitle>
+                        <CardDescription>
+                          Use the map to mark the exact location of the waste.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <FormField
+                          control={form.control}
+                          name="latitude"
+                          render={() => (
+                            <FormItem>
+                              <FormControl>
+                                <MapComponent
+                                  onLocationSelect={handleLocationSelect}
+                                  initialLatitude={form.getValues("latitude")}
+                                  initialLongitude={form.getValues("longitude")}
+                                  initialAddress={form.getValues("address")}
                                 />
-                                {fileError && (
-                                  <p className="text-sm text-red-500">{fileError}</p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="latitude"
-                    render={() => (
-                      <FormItem>
-                        <FormLabel>Location</FormLabel>
-                        <FormControl>
-                          <MapComponent
-                            onLocationSelect={handleLocationSelect}
-                            initialLatitude={form.getValues("latitude")}
-                            initialLongitude={form.getValues("longitude")}
-                            initialAddress={form.getValues("address")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+                
+                <div className="mt-8 flex justify-end">
                   <Button 
                     type="submit" 
-                    className="w-full"
+                    size="lg"
+                    className="w-full sm:w-auto px-8 gap-2"
                     disabled={createReportMutation.isPending}
                   >
                     {createReportMutation.isPending ? (
-                      <>Submitting Report...</>
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Submitting...
+                      </>
                     ) : (
-                      <>Submit Report</>
+                      <>
+                        <Send className="h-4 w-4" />
+                        Submit Report
+                      </>
                     )}
                   </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                </div>
+              </form>
+            </Form>
+          </div>
         </main>
         
         <Footer />
