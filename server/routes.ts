@@ -94,14 +94,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   // --------------------
 
-  // Check if an admin exists for a city
+  // Check if an admin exists for a city, state, and pincode
   apiRouter.get("/auth/check-admin", async (req, res) => {
     const city = req.query.city as string;
-    if (!city) {
-      return res.status(400).json({ message: "City query parameter is required." });
+    const state = req.query.state as string;
+    const pincode = req.query.pincode as string;
+    if (!city || !state || !pincode) {
+      return res.status(400).json({ message: "City, state, and pincode query parameters are required." });
     }
     try {
-      const adminCount = await storage.getUserAdminsCountByCity(city);
+      const adminCount = await storage.getUserAdminsCountByLocation(city, state, pincode);
       res.json({ exists: adminCount > 0 });
     } catch (error) {
       console.error("Check admin error:", error);
@@ -128,12 +130,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       
       if (userData.role === "admin") {
-        const adminCount = await storage.getUserAdminsCountByCity(userData.city);
+        const adminCount = await storage.getUserAdminsCountByLocation(userData.city, userData.state, userData.pincode);
         
-        // Case 1: First admin for the city
+        // Case 1: First admin for the city, state, and pincode
         if (adminCount === 0) {
           if (!userData.secretCode) {
-            return res.status(400).json({ message: "Secret code is required for the first admin of a city." });
+            return res.status(400).json({ message: "Secret code is required for the first admin of this location." });
           }
           
           const secretCode = await storage.getAdminSecretCode(userData.secretCode);
@@ -152,10 +154,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const { password, ...userWithoutPassword } = user;
           return res.status(201).json(userWithoutPassword);
         } 
-        // Case 2: Subsequent admins for the city
+        // Case 2: Subsequent admins for the location
         else {
           if (adminCount >= 5) {
-            return res.status(400).json({ message: "Maximum number of admins reached for this city." });
+            return res.status(400).json({ message: "Maximum number of admins reached for this location." });
           }
           
           // Create an admin request
@@ -201,6 +203,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Find user by email
       const user = await storage.getUserByEmail(email);
+      
+      // If user doesn't exist and role is admin, check for pending admin request
+      if (!user && role === "admin") {
+        const adminRequest = await storage.getAdminRequestByEmail(email);
+        if (adminRequest) {
+          // Verify password
+          const isValidPassword = await bcrypt.compare(password, adminRequest.password);
+          if (!isValidPassword) {
+            return res.status(401).json({ message: "Invalid credentials" });
+          }
+          
+          // Return request status with appropriate HTTP status
+          const statusMessage = adminRequest.status === "pending" 
+            ? "Your admin registration request is pending approval." 
+            : adminRequest.status === "approved"
+            ? "Your admin registration request has been approved. Please contact support."
+            : "Your admin registration request has been rejected.";
+          
+          return res.status(403).json({ 
+            requestStatus: adminRequest.status,
+            message: statusMessage
+          });
+        }
+      }
       
       if (!user || user.role !== role) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -278,7 +304,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // --------------------
   apiRouter.get("/admin-requests", requireAdmin, async (req, res) => {
     try {
-      const requests = await storage.getPendingAdminRequestsByCity(req.session.city!);
+      // Get the current admin's full location details
+      const currentAdmin = await storage.getUser(req.session.userId!);
+      if (!currentAdmin) {
+        return res.status(401).json({ message: "Admin not found" });
+      }
+      
+      // Get requests for the same location (city, state, pincode)
+      const requests = await storage.getPendingAdminRequestsByLocation(
+        currentAdmin.city,
+        currentAdmin.state,
+        currentAdmin.pincode
+      );
       res.json(requests);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch admin requests" });
@@ -288,21 +325,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/admin-requests/:id/approve", requireAdmin, async (req, res) => {
     const requestId = parseInt(req.params.id);
     try {
-      const cityAdmins = await storage.getUsersByCity(req.session.city!);
-      const superAdmin = cityAdmins.filter(u => u.role === 'admin').sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+      // Get the current admin's full location details
+      const currentAdmin = await storage.getUser(req.session.userId!);
+      if (!currentAdmin) {
+        return res.status(401).json({ message: "Admin not found" });
+      }
 
-      if (req.session.userId !== superAdmin.id) {
+      // Get admins for the same location (city, state, pincode)
+      const locationAdmins = await storage.getUsersByLocation(
+        currentAdmin.city,
+        currentAdmin.state,
+        currentAdmin.pincode
+      );
+      const superAdmin = locationAdmins
+        .filter(u => u.role === 'admin')
+        .sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+
+      if (!superAdmin || req.session.userId !== superAdmin.id) {
         return res.status(403).json({ message: "Only the superadmin can approve requests." });
       }
 
       const request = await storage.getAdminRequestById(requestId);
-      if (!request || request.city !== req.session.city) {
-        return res.status(404).json({ message: "Request not found." });
+      if (!request || 
+          request.city !== currentAdmin.city || 
+          request.state !== currentAdmin.state || 
+          request.pincode !== currentAdmin.pincode) {
+        return res.status(404).json({ message: "Request not found for your location." });
       }
 
-      const adminCount = await storage.getUserAdminsCountByCity(request.city);
+      const adminCount = await storage.getUserAdminsCountByLocation(
+        request.city,
+        request.state,
+        request.pincode
+      );
       if (adminCount >= 5) {
-        return res.status(400).json({ message: "Maximum number of admins reached for this city" });
+        return res.status(400).json({ message: "Maximum number of admins reached for this location" });
       }
 
       await storage.createUser({
@@ -325,11 +382,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/admin-requests/:id/reject", requireAdmin, async (req, res) => {
     const requestId = parseInt(req.params.id);
     try {
-      const cityAdmins = await storage.getUsersByCity(req.session.city!);
-      const superAdmin = cityAdmins.filter(u => u.role === 'admin').sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+      // Get the current admin's full location details
+      const currentAdmin = await storage.getUser(req.session.userId!);
+      if (!currentAdmin) {
+        return res.status(401).json({ message: "Admin not found" });
+      }
 
-      if (req.session.userId !== superAdmin.id) {
+      // Get admins for the same location (city, state, pincode)
+      const locationAdmins = await storage.getUsersByLocation(
+        currentAdmin.city,
+        currentAdmin.state,
+        currentAdmin.pincode
+      );
+      const superAdmin = locationAdmins
+        .filter(u => u.role === 'admin')
+        .sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime())[0];
+
+      if (!superAdmin || req.session.userId !== superAdmin.id) {
         return res.status(403).json({ message: "Only the superadmin can reject requests." });
+      }
+
+      const request = await storage.getAdminRequestById(requestId);
+      if (!request || 
+          request.city !== currentAdmin.city || 
+          request.state !== currentAdmin.state || 
+          request.pincode !== currentAdmin.pincode) {
+        return res.status(404).json({ message: "Request not found for your location." });
       }
       
       await storage.updateAdminRequestStatus(requestId, 'rejected');

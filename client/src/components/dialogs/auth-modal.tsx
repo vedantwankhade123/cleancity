@@ -229,7 +229,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         password: values.password,
         role: userType,
       })
-      handleClose()
+      // On success, the useAuth hook will handle redirection, so we don't need to call handleClose()
     } catch (err: any) {
       let errorMessage = 'Failed to login.';
       try {

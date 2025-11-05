@@ -34,15 +34,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
+    // Sanitize optional fields - convert empty strings to undefined/null
+    const sanitizedUser = {
+      ...user,
+      email: user.email.toLowerCase(),
+      role: user.role || "user",
+      phone: user.phone && user.phone.trim() !== "" ? user.phone : undefined,
+      dob: user.dob && user.dob.trim() !== "" ? user.dob : undefined,
+      address: user.address && user.address.trim() !== "" ? user.address : undefined,
+      secretCode: user.secretCode && user.secretCode.trim() !== "" ? user.secretCode : undefined,
+      isActive: true,
+      rewardPoints: 0,
+    };
+    
     const result = await db
       .insert(users)
-      .values({
-        ...user,
-        email: user.email.toLowerCase(),
-        role: user.role || "user",
-        isActive: true,
-        rewardPoints: 0,
-      })
+      .values(sanitizedUser)
       .returning();
     
     return result[0];
@@ -74,6 +81,19 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.city, city));
   }
 
+  async getUsersByLocation(city: string, state: string, pincode: string): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.city, city),
+          eq(users.state, state),
+          eq(users.pincode, pincode)
+        )
+      );
+  }
+
   async getUserAdminsCountByCity(city: string): Promise<number> {
     const result = await db
       .select({ value: count() })
@@ -81,6 +101,21 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(users.city, city),
+          eq(users.role, "admin")
+        )
+      );
+    return result[0]?.value ?? 0;
+  }
+
+  async getUserAdminsCountByLocation(city: string, state: string, pincode: string): Promise<number> {
+    const result = await db
+      .select({ value: count() })
+      .from(users)
+      .where(
+        and(
+          eq(users.city, city),
+          eq(users.state, state),
+          eq(users.pincode, pincode),
           eq(users.role, "admin")
         )
       );
@@ -204,6 +239,14 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getAdminRequestByEmail(email: string): Promise<AdminRequest | undefined> {
+    const result = await db
+      .select()
+      .from(adminRequests)
+      .where(eq(adminRequests.email, email.toLowerCase()));
+    return result[0];
+  }
+
   async getPendingAdminRequestsByCity(city: string): Promise<AdminRequest[]> {
     return await db
       .select()
@@ -211,6 +254,20 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(adminRequests.city, city),
+          eq(adminRequests.status, "pending")
+        )
+      );
+  }
+
+  async getPendingAdminRequestsByLocation(city: string, state: string, pincode: string): Promise<AdminRequest[]> {
+    return await db
+      .select()
+      .from(adminRequests)
+      .where(
+        and(
+          eq(adminRequests.city, city),
+          eq(adminRequests.state, state),
+          eq(adminRequests.pincode, pincode),
           eq(adminRequests.status, "pending")
         )
       );

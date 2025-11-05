@@ -23,7 +23,9 @@ export interface IStorage {
   deleteUser(id: number): Promise<boolean>;
   getAllUsers(): Promise<User[]>;
   getUsersByCity(city: string): Promise<User[]>;
+  getUsersByLocation(city: string, state: string, pincode: string): Promise<User[]>;
   getUserAdminsCountByCity(city: string): Promise<number>;
+  getUserAdminsCountByLocation(city: string, state: string, pincode: string): Promise<number>;
 
   // Admin secret code operations
   getAdminSecretCode(code: string): Promise<AdminSecretCode | undefined>;
@@ -49,7 +51,9 @@ export interface IStorage {
   // Admin request operations
   createAdminRequest(request: InsertAdminRequest): Promise<AdminRequest>;
   getAdminRequestById(id: number): Promise<AdminRequest | undefined>;
+  getAdminRequestByEmail(email: string): Promise<AdminRequest | undefined>;
   getPendingAdminRequestsByCity(city: string): Promise<AdminRequest[]>;
+  getPendingAdminRequestsByLocation(city: string, state: string, pincode: string): Promise<AdminRequest[]>;
   updateAdminRequestStatus(id: number, status: "approved" | "rejected"): Promise<AdminRequest | undefined>;
 }
 
