@@ -94,6 +94,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   // --------------------
 
+  // Check if an admin exists for a city
+  app.get("/api/auth/check-admin", async (req, res) => {
+    const city = req.query.city as string;
+    if (!city) {
+      return res.status(400).json({ message: "City query parameter is required." });
+    }
+    try {
+      const adminCount = await storage.getUserAdminsCountByCity(city);
+      res.json({ exists: adminCount > 0 });
+    } catch (error) {
+      console.error("Check admin error:", error);
+      res.status(500).json({ message: "Failed to check admin status." });
+    }
+  });
+
   // User registration
   app.post("/api/auth/register", async (req, res) => {
     const validation = validateRequest(insertUserSchema, req.body);

@@ -162,6 +162,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  // New state for admin check
+  const [adminExists, setAdminExists] = useState<boolean | null>(null);
+  const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
+
   const currentConfig = userType === 'admin' ? adminStepConfig : userStepConfig
   const totalSteps = currentConfig.length
   const currentStepInfo = currentConfig[step - 1]
@@ -187,6 +191,43 @@ const AuthModal: React.FC<AuthModalProps> = ({
       termsAccepted: false,
     },
   })
+
+  const cityValue = signupForm.watch('city');
+
+  // Effect to check for existing admin when city changes
+  React.useEffect(() => {
+    if (!isOpen) {
+      setAdminExists(null);
+      return;
+    }
+    
+    if (!cityValue || userType !== 'admin') {
+      setAdminExists(null);
+      return;
+    }
+
+    const checkAdminStatus = async () => {
+      setIsCheckingAdmin(true);
+      setAdminExists(null);
+      try {
+        const response = await fetch(`/api/auth/check-admin?city=${encodeURIComponent(cityValue)}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        setAdminExists(data.exists);
+      } catch (e) {
+        console.error("Failed to check admin status", e);
+        setAdminExists(null);
+      } finally {
+        setIsCheckingAdmin(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      checkAdminStatus();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [cityValue, userType, isOpen]);
 
   const handleNext = async () => {
     const isValid = await signupForm.trigger(currentStepInfo.fields as any)
@@ -505,29 +546,49 @@ const AuthModal: React.FC<AuthModalProps> = ({
         if (userType === 'admin') {
           return (
             <div className='space-y-4'>
-              <FormField
-                control={signupForm.control}
-                name='secretCode'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Admin Secret Code</FormLabel>
-                    <FormControl>
-                      <div className='relative'>
-                        <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                        <Input
-                          placeholder='Enter secret code (if you are the first admin)'
-                          {...field}
-                          className='pl-10'
-                        />
-                      </div>
-                    </FormControl>
-                    <p className='text-xs text-gray-500 mt-1'>
-                      Only required for the first admin of a city. Subsequent admins will be approved.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {isCheckingAdmin && (
+                <div className="flex items-center text-sm text-gray-500 p-2 rounded-md bg-gray-50">
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Checking admin status for {cityValue}...
+                </div>
+              )}
+
+              {adminExists === false && (
+                <FormField
+                  control={signupForm.control}
+                  name='secretCode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Admin Secret Code</FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                          <Input
+                            placeholder='Enter secret code for first admin'
+                            {...field}
+                            className='pl-10'
+                          />
+                        </div>
+                      </FormControl>
+                      <p className='text-xs text-gray-500 mt-1'>
+                        Required for the first admin of a city.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {adminExists === true && (
+                <Alert variant="default" className="bg-blue-50 border-blue-200">
+                  <ShieldCheck className="h-4 w-4 text-blue-600" />
+                  <AlertTitle className="text-blue-800">Admin Exists</AlertTitle>
+                  <AlertDescription className="text-blue-700">
+                    An admin already exists for {cityValue}. Your request will be sent for approval.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <FormField
                 control={signupForm.control}
                 name='termsAccepted'
@@ -839,11 +900,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         Next <ArrowRight className='h-4 w-4' />
                       </Button>
                     ) : (
-                      <Button type='submit' disabled={isLoading}>
+                      <Button type='submit' disabled={isLoading || isCheckingAdmin}>
                         {isLoading && (
                           <Loader2 className='h-4 w-4 animate-spin mr-2' />
                         )}
-                        {userType === 'admin' ? 'Submit Request' : 'Create Account'}
+                        {userType === 'admin' 
+                          ? (adminExists ? 'Submit Request' : 'Create Account') 
+                          : 'Create Account'}
                       </Button>
                     )}
                   </div>
