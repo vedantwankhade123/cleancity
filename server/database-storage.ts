@@ -197,27 +197,24 @@ export async function initializeAdminSecretCodes() {
 
   // Only add default codes if none exist
   if (existingCodes.length === 0) {
-    console.log("Initializing admin secret codes in database...");
+    console.log("Initializing admin secret codes for Maharashtra...");
 
-    // Add default admin secret codes
-    const defaultCodes = [
-      { code: "CLEAN_MUMBAI", city: "Mumbai" },
-      { code: "CLEAN_PUNE", city: "Pune" },
-      { code: "CLEAN_NAGPUR", city: "Nagpur" },
-      { code: "CLEAN_NASHIK", city: "Nashik" },
-      { code: "CLEAN_AURANGABAD", city: "Aurangabad" },
-      { code: "CLEAN_SOLAPUR", city: "Solapur" },
-      { code: "CLEAN_AMRAVATI", city: "Amravati" },
-      { code: "CLEAN_KOLHAPUR", city: "Kolhapur" },
-      { code: "CLEAN_SANGLI", city: "Sangli" },
-      { code: "CLEAN_JALGAON", city: "Jalgaon" }
+    // Add default admin secret codes for cities in Maharashtra
+    const maharashtraCities = [
+      "Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur",
+      "Amravati", "Kolhapur", "Nanded", "Sangli", "Jalgaon", "Akola", "Latur",
+      "Dhule", "Ahmednagar", "Chandrapur", "Parbhani", "Ichalkaranji", "Jalna"
     ];
-    
+
+    const defaultCodes = maharashtraCities.map(city => ({
+      code: `CLEAN_${city.toUpperCase().replace(/\s/g, '_')}`,
+      city: city
+    }));
 
     for (const codeData of defaultCodes) {
       await db.insert(adminSecretCodes).values({ ...codeData, isUsed: false });
     }
 
-    console.log("Admin secret codes initialized successfully");
+    console.log("Admin secret codes for Maharashtra initialized successfully");
   }
 }

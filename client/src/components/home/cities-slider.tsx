@@ -2,26 +2,9 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const cities = [
-  "Mumbai",
-  "Pune",
-  "Nagpur",
-  "Thane",
-  "Nashik",
-  "Aurangabad",
-  "Solapur",
-  "Amravati",
-  "Kolhapur",
-  "Nanded",
-  "Sangli",
-  "Jalgaon",
-  "Akola",
-  "Latur",
-  "Dhule",
-  "Ahmednagar",
-  "Chandrapur",
-  "Parbhani",
-  "Ichalkaranji",
-  "Jalna",
+  "Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur",
+  "Amravati", "Kolhapur", "Nanded", "Sangli", "Jalgaon", "Akola", "Latur",
+  "Dhule", "Ahmednagar", "Chandrapur", "Parbhani", "Ichalkaranji", "Jalna"
 ];
 
 const CitiesSlider: React.FC = () => {
@@ -56,4 +39,4 @@ const CitiesSlider: React.FC = () => {
   );
 };
 
-export default CitiesSlider; 
+export default CitiesSlider;

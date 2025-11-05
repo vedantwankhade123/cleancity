@@ -20,7 +20,10 @@ const INDIAN_CITIES = [
   'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Ahmedabad',
   'Chennai', 'Kolkata', 'Surat', 'Pune', 'Jaipur',
   'Lucknow', 'Kanpur', 'Nagpur', 'Visakhapatnam', 'Indore',
-  'Thane', 'Bhopal', 'Patna', 'Vadodara', 'Ghaziabad','Amravati'
+  'Thane', 'Bhopal', 'Patna', 'Vadodara', 'Ghaziabad', 'Amravati',
+  "Nashik", "Aurangabad", "Solapur", "Kolhapur", "Nanded", "Sangli",
+  "Jalgaon", "Akola", "Latur", "Dhule", "Ahmednagar", "Chandrapur",
+  "Parbhani", "Ichalkaranji", "Jalna"
 ].sort();
 
 const AirQualityPage: React.FC<AirQualityPageProps> = ({
