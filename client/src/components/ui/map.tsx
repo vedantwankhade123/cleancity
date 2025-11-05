@@ -9,12 +9,16 @@ import { useToast } from "@/hooks/use-toast";
 // Fix for default icon issue with Vite/Webpack
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 
-const defaultIcon = new L.Icon({
-  iconUrl,
-  shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+// This is the crucial fix. It deletes the broken default icon lookup
+// and replaces it with a correctly configured one.
+// @ts-ignore
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: iconRetinaUrl,
+  iconUrl: iconUrl,
+  shadowUrl: shadowUrl,
 });
 
 interface MapComponentProps {
@@ -55,7 +59,6 @@ const DraggableMarker = ({ position, setPosition, onAddressUpdate }: { position:
       eventHandlers={eventHandlers}
       position={position}
       ref={markerRef}
-      icon={defaultIcon}
     />
   );
 };
