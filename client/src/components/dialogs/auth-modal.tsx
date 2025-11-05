@@ -556,7 +556,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           {/* Right Column: Form */}
-          <div className='p-6 md:p-8 flex flex-col justify-center'>
+          <div className='p-6 md:p-8 flex flex-col justify-center m-1 rounded-lg'>
             <DialogHeader className='text-center mb-4'>
               <DialogTitle className='text-2xl font-bold'>
                 <span className='text-primary'>Clean</span>
