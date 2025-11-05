@@ -1,5 +1,5 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,10 +40,19 @@ interface Notification {
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [lastRead, setLastRead] = useState(new Date(0));
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
   });
+
+  useEffect(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`lastRead_${user.id}`);
+      setLastRead(saved ? new Date(saved) : new Date(0));
+    }
+  }, [user?.id]);
 
   // Fetch reports
   const { 
@@ -74,6 +83,20 @@ const AdminDashboard: React.FC = () => {
     enabled: !!user,
     staleTime: 1000 * 60 * 1, // refetch every minute
   });
+
+  const hasUnread = notifications && notifications.some(n => new Date(n.timestamp) > lastRead);
+
+  const handleMarkAllAsRead = () => {
+    if (!user?.id) return;
+    const now = new Date();
+    localStorage.setItem(`lastRead_${user.id}`, now.toISOString());
+    setLastRead(now);
+  };
+
+  const handleClearAll = () => {
+    if (!user?.id) return;
+    queryClient.setQueryData(['notifications', user?.id], []);
+  };
 
   // Process reports to create a map of events by date
   const reportEventsByDate = React.useMemo(() => {
@@ -232,13 +255,19 @@ const AdminDashboard: React.FC = () => {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
                         <Bell className="h-5 w-5" />
-                        {notifications && notifications.length > 0 && (
+                        {hasUnread && (
                           <span className="absolute top-1.5 right-1.5 bg-red-500 text-white rounded-full w-2 h-2" />
                         )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-80">
-                      <div className="p-2 font-medium">Notifications</div>
+                      <div className="p-2 flex justify-between items-center">
+                        <div className="font-medium">Notifications</div>
+                        <div className="flex gap-2">
+                          <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead} disabled={!hasUnread}>Mark all as read</Button>
+                          <Button variant="link" size="sm" className="h-auto p-0 text-xs text-destructive" onClick={handleClearAll} disabled={!notifications || notifications.length === 0}>Clear all</Button>
+                        </div>
+                      </div>
                       <DropdownMenuSeparator />
                       <div className="p-2 max-h-60 overflow-y-auto">
                         {isLoadingNotifications ? (

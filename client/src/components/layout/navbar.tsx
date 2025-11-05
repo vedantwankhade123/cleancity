@@ -11,7 +11,7 @@ import {
 import { Menu, X, User, LogOut, Bell, Loader2, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { AnimatePresence, motion } from "framer-motion";
 import { timeAgo } from "@/lib/utils";
@@ -49,6 +49,15 @@ const Navbar: React.FC<NavbarProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const isHomePage = location === "/";
+  const queryClient = useQueryClient();
+  const [lastRead, setLastRead] = useState(new Date(0));
+
+  useEffect(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`lastRead_${user.id}`);
+      setLastRead(saved ? new Date(saved) : new Date(0));
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (!isHomePage) {
@@ -113,6 +122,20 @@ const Navbar: React.FC<NavbarProps> = ({
     enabled: isAuthenticated,
     staleTime: 1000 * 60 * 1,
   });
+
+  const hasUnread = notifications && notifications.some(n => new Date(n.timestamp) > lastRead);
+
+  const handleMarkAllAsRead = () => {
+    if (!user?.id) return;
+    const now = new Date();
+    localStorage.setItem(`lastRead_${user.id}`, now.toISOString());
+    setLastRead(now);
+  };
+
+  const handleClearAll = () => {
+    if (!user?.id) return;
+    queryClient.setQueryData(['notifications', user?.id], []);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -197,13 +220,19 @@ const Navbar: React.FC<NavbarProps> = ({
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
                         <Bell className="h-5 w-5" />
-                        {notifications && notifications.length > 0 && (
+                        {hasUnread && (
                           <span className="absolute top-1.5 right-1.5 bg-accent text-white rounded-full w-2 h-2" />
                         )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-80">
-                      <div className="p-2 font-medium">Notifications</div>
+                      <div className="p-2 flex justify-between items-center">
+                        <div className="font-medium">Notifications</div>
+                        <div className="flex gap-2">
+                          <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={handleMarkAllAsRead} disabled={!hasUnread}>Mark all as read</Button>
+                          <Button variant="link" size="sm" className="h-auto p-0 text-xs text-destructive" onClick={handleClearAll} disabled={!notifications || notifications.length === 0}>Clear all</Button>
+                        </div>
+                      </div>
                       <DropdownMenuSeparator />
                       <div className="p-2 max-h-60 overflow-y-auto">
                         {isLoadingNotifications ? <div className="flex justify-center p-4"><Loader2 className="h-5 w-5 animate-spin" /></div> :
