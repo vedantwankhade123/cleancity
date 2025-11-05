@@ -36,7 +36,41 @@ const Navbar: React.FC<NavbarProps> = ({
   const { isAuthenticated, user, logout } = useAuth();
   const [location, navigate] = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const isHomePage = location === "/";
+
+  const navLinks = [
+    { href: "/", label: "Home", type: "link", sectionId: "home" },
+    { href: "#about", label: "About", type: "button", sectionId: "about" },
+    { href: "#how-it-works", label: "How It Works", type: "button", sectionId: "how-it-works" },
+    { href: "#rewards", label: "Rewards", type: "button", sectionId: "rewards" },
+    { href: "#contact", label: "Contact", type: "button", sectionId: "contact" },
+    { href: "/air-quality", label: "Air Quality", type: "link" },
+  ];
+
+  useEffect(() => {
+    if (!isHomePage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -60% 0px" }
+    );
+
+    navLinks.forEach((link) => {
+      if (link.sectionId) {
+        const element = document.getElementById(link.sectionId);
+        if (element) observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [isHomePage]);
 
   const handleNavigation = (path: string) => {
     setIsMenuOpen(false);
@@ -46,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({
         element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      navigate(`/${path}`);
+      navigate(`/${path.startsWith('#') ? '' : path}`);
     }
   };
 
@@ -100,19 +134,19 @@ const Navbar: React.FC<NavbarProps> = ({
       : "bg-white/80 backdrop-blur-lg border-b border-gray-200/80 shadow-sm py-2"
   );
 
-  const floatingLinkClass = (path: string) => cn(
-    "transition-colors duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100",
-    location === path && "bg-primary text-white hover:bg-primary/90"
-  );
-
-  const navLinks = [
-    { href: "/", label: "Home", type: "link" },
-    { href: "#about", label: "About", type: "button" },
-    { href: "#how-it-works", label: "How It Works", type: "button" },
-    { href: "#rewards", label: "Rewards", type: "button" },
-    { href: "#contact", label: "Contact", type: "button" },
-    { href: "/air-quality", label: "Air Quality", type: "link" },
-  ];
+  const floatingLinkClass = (path: string, sectionId?: string) => {
+    let isActive = false;
+    if (isHomePage) {
+      isActive = activeSection === sectionId;
+    } else {
+      isActive = location === path;
+    }
+    
+    return cn(
+      "transition-colors duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100",
+      isActive && "bg-primary text-white hover:bg-primary/90"
+    );
+  };
 
   return (
     <>
@@ -129,9 +163,9 @@ const Navbar: React.FC<NavbarProps> = ({
               <nav className="flex items-center space-x-1 transition-all duration-300 bg-white/90 backdrop-blur-md border border-gray-200/90 shadow-sm rounded-full p-1.5">
                 {navLinks.map(link => (
                   link.type === 'link' ? (
-                    <Link key={link.href} href={link.href} className={floatingLinkClass(link.href)}>{link.label}</Link>
+                    <Link key={link.href} href={link.href} className={floatingLinkClass(link.href, link.sectionId)}>{link.label}</Link>
                   ) : (
-                    <button key={link.href} onClick={() => handleNavigation(link.href)} className={floatingLinkClass(link.href)}>{link.label}</button>
+                    <button key={link.href} onClick={() => handleNavigation(link.href)} className={floatingLinkClass(link.href, link.sectionId)}>{link.label}</button>
                   )
                 ))}
               </nav>
