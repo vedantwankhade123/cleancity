@@ -27,6 +27,7 @@ import {
   Loader2, Mail, Lock, User, Phone, Calendar, Home, MapPin, KeyRound,
   ArrowRight, ArrowLeft, AlertTriangle, FileText, ShieldCheck
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Schemas
 const loginSchema = z.object({
@@ -190,7 +191,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type, userType, 
             <img
               src={type === 'login' ? '/login.png' : '/signup.png'}
               alt={type === 'login' ? 'Login illustration' : 'Signup illustration'}
-              className="absolute inset-0 w-full h-full object-cover"
+              className={cn(
+                "absolute inset-0 w-full h-full",
+                type === 'login' ? "object-contain p-8" : "object-cover"
+              )}
             />
           </div>
 
