@@ -56,7 +56,7 @@ const HeroSection: React.FC = () => {
   return (
     <section id="home" className="relative w-full bg-gradient-to-br from-gray-50 via-white to-green-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-5 gap-8 items-center min-h-screen pt-24 md:pt-0">
+        <div className="grid md:grid-cols-5 gap-8 items-center min-h-screen pt-24 md:pt-0 pb-12">
           {/* Left Column: Text Content */}
           <motion.div
             className="md:col-span-2 text-left flex flex-col justify-center"
