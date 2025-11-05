@@ -27,6 +27,15 @@ interface Notification {
   timestamp: string;
 }
 
+const navLinks = [
+  { href: "/", label: "Home", type: "link", sectionId: "home" },
+  { href: "#about", label: "About", type: "button", sectionId: "about" },
+  { href: "#how-it-works", label: "How It Works", type: "button", sectionId: "how-it-works" },
+  { href: "#rewards", label: "Rewards", type: "button", sectionId: "rewards" },
+  { href: "#contact", label: "Contact", type: "button", sectionId: "contact" },
+  { href: "/air-quality", label: "Air Quality", type: "link" },
+];
+
 const Navbar: React.FC<NavbarProps> = ({ 
   setShowLoginModal,
   setShowSignupModal,
@@ -39,38 +48,46 @@ const Navbar: React.FC<NavbarProps> = ({
   const [activeSection, setActiveSection] = useState("home");
   const isHomePage = location === "/";
 
-  const navLinks = [
-    { href: "/", label: "Home", type: "link", sectionId: "home" },
-    { href: "#about", label: "About", type: "button", sectionId: "about" },
-    { href: "#how-it-works", label: "How It Works", type: "button", sectionId: "how-it-works" },
-    { href: "#rewards", label: "Rewards", type: "button", sectionId: "rewards" },
-    { href: "#contact", label: "Contact", type: "button", sectionId: "contact" },
-    { href: "/air-quality", label: "Air Quality", type: "link" },
-  ];
-
   useEffect(() => {
-    if (!isHomePage) return;
+    if (!isHomePage) {
+      const currentLink = navLinks.find(link => link.href === location);
+      setActiveSection(currentLink?.sectionId || (location === '/' ? 'home' : ''));
+      return;
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+    let observer: IntersectionObserver;
+    const elementsToObserve: Element[] = [];
+
+    const timer = setTimeout(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id);
+            }
+          });
+        },
+        { rootMargin: "-40% 0px -60% 0px" }
+      );
+
+      navLinks.forEach((link) => {
+        if (link.sectionId) {
+          const element = document.getElementById(link.sectionId);
+          if (element) {
+            observer.observe(element);
+            elementsToObserve.push(element);
           }
-        });
-      },
-      { rootMargin: "-40% 0px -60% 0px" }
-    );
+        }
+      });
+    }, 100);
 
-    navLinks.forEach((link) => {
-      if (link.sectionId) {
-        const element = document.getElementById(link.sectionId);
-        if (element) observer.observe(element);
+    return () => {
+      clearTimeout(timer);
+      if (observer) {
+        elementsToObserve.forEach(el => observer.unobserve(el));
       }
-    });
-
-    return () => observer.disconnect();
-  }, [isHomePage]);
+    };
+  }, [isHomePage, location]);
 
   const handleNavigation = (path: string) => {
     setIsMenuOpen(false);
