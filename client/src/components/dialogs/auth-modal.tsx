@@ -38,6 +38,8 @@ import {
   AlertTriangle,
   FileText,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -164,6 +166,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const { login, register, isLoading } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState(1)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const currentConfig = userType === 'admin' ? adminStepConfig : userStepConfig
   const totalSteps = currentConfig.length
@@ -226,6 +230,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const handleClose = () => {
     setError(null)
     setStep(1)
+    setShowPassword(false)
+    setShowConfirmPassword(false)
     loginForm.reset()
     signupForm.reset()
     onClose()
@@ -288,11 +294,25 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       <div className='relative'>
                         <Lock className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
                         <Input
-                          type='password'
+                          type={showPassword ? 'text' : 'password'}
                           placeholder='••••••••'
                           {...field}
-                          className='pl-10'
+                          className='pl-10 pr-10'
                         />
+                        <button
+                          type='button'
+                          onClick={() => setShowPassword(!showPassword)}
+                          className='absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer'
+                          aria-label={
+                            showPassword ? 'Hide password' : 'Show password'
+                          }
+                        >
+                          {showPassword ? (
+                            <EyeOff className='h-4 w-4 text-gray-400' />
+                          ) : (
+                            <Eye className='h-4 w-4 text-gray-400' />
+                          )}
+                        </button>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -309,11 +329,29 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       <div className='relative'>
                         <Lock className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
                         <Input
-                          type='password'
+                          type={showConfirmPassword ? 'text' : 'password'}
                           placeholder='••••••••'
                           {...field}
-                          className='pl-10'
+                          className='pl-10 pr-10'
                         />
+                        <button
+                          type='button'
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className='absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer'
+                          aria-label={
+                            showConfirmPassword
+                              ? 'Hide password'
+                              : 'Show password'
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className='h-4 w-4 text-gray-400' />
+                          ) : (
+                            <Eye className='h-4 w-4 text-gray-400' />
+                          )}
+                        </button>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -614,11 +652,27 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           <div className='relative'>
                             <Lock className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
                             <Input
-                              type='password'
+                              type={showPassword ? 'text' : 'password'}
                               placeholder='••••••••'
                               {...field}
-                              className='pl-10'
+                              className='pl-10 pr-10'
                             />
+                            <button
+                              type='button'
+                              onClick={() => setShowPassword(!showPassword)}
+                              className='absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer'
+                              aria-label={
+                                showPassword
+                                  ? 'Hide password'
+                                  : 'Show password'
+                              }
+                            >
+                              {showPassword ? (
+                                <EyeOff className='h-4 w-4 text-gray-400' />
+                              ) : (
+                                <Eye className='h-4 w-4 text-gray-400' />
+                              )}
+                            </button>
                           </div>
                         </FormControl>
                         <FormMessage />
