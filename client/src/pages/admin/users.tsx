@@ -66,6 +66,11 @@ import {
   AlertTriangle,
   Trash,
   Edit,
+  Mail,
+  Lock,
+  Phone,
+  Home,
+  MapPin,
 } from "lucide-react";
 import { User as UserType, Report } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -358,7 +363,7 @@ const AdminUsers: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex">
         <Sidebar />
         
-        <div className="flex-1 md:ml-64">
+        <div className="flex-1 md:ml-[calc(16rem+10px)]">
           {/* Admin Dashboard Header */}
           <header className="bg-white shadow-sm sticky top-0 z-40">
             <div className="container px-4 sm:px-6 lg:px-8">
@@ -565,126 +570,171 @@ const AdminUsers: React.FC = () => {
           <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
             <DialogContent className="sm:max-w-md md:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Add New User</DialogTitle>
-                <DialogDescription>Create a new user account.</DialogDescription>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <UserPlus className="h-6 w-6 text-primary" />
+                  Add New User
+                </DialogTitle>
+                <DialogDescription>
+                  Fill in the details below to create a new user account.
+                </DialogDescription>
               </DialogHeader>
-              <div className="py-4 max-h-[60vh] overflow-y-auto pr-4">
+              <div className="py-4 max-h-[70vh] overflow-y-auto px-1 -mx-1">
                 <Form {...addUserForm}>
-                  <form onSubmit={addUserForm.handleSubmit(onAddUserSubmit)} className="space-y-4">
-                    <FormField
-                      control={addUserForm.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="john.doe@example.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="(123) 456-7890" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="123 Main St" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="City" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="State" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={addUserForm.control}
-                      name="pincode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pincode (Optional)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="12345" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" className="w-full" disabled={addUserMutation.isPending}>
-                      {addUserMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Adding user...
-                        </>
-                      ) : (
-                        "Add User"
-                      )}
-                    </Button>
+                  <form onSubmit={addUserForm.handleSubmit(onAddUserSubmit)} className="space-y-6 px-1">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-3 border-b pb-2">
+                        Account Information
+                      </h4>
+                      <div className="space-y-4 pt-2">
+                        <FormField
+                          control={addUserForm.control}
+                          name="fullName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full Name</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input placeholder="John Doe" {...field} className="pl-10" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={addUserForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <Input type="email" placeholder="john.doe@example.com" {...field} className="pl-10" />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addUserForm.control}
+                            name="password"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <Input type="password" placeholder="••••••••" {...field} className="pl-10" />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-3 border-b pb-2">
+                        Personal & Location Details (Optional)
+                      </h4>
+                      <div className="space-y-4 pt-2">
+                        <FormField
+                          control={addUserForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input placeholder="(123) 456-7890" {...field} className="pl-10" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={addUserForm.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Address</FormLabel>
+                              <FormControl>
+                                <div className="relative">
+                                  <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input placeholder="123 Main St" {...field} className="pl-10" />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <FormField
+                            control={addUserForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="City" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addUserForm.control}
+                            name="state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="State" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={addUserForm.control}
+                            name="pincode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Pincode</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="12345" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter className="pt-4">
+                      <Button type="button" variant="outline" onClick={() => setIsAddUserDialogOpen(false)}>Cancel</Button>
+                      <Button type="submit" className="gap-2" disabled={addUserMutation.isPending}>
+                        {addUserMutation.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="h-4 w-4" />
+                            Create User
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
                   </form>
                 </Form>
               </div>

@@ -136,7 +136,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 w-64 bg-gray-900 text-white hidden md:flex md:flex-col z-50",
+          "fixed top-[5px] bottom-[5px] left-[5px] w-64 bg-gray-900 text-white hidden md:flex md:flex-col z-50 rounded-xl shadow-lg overflow-hidden",
           className
         )}
       >
@@ -155,8 +155,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
       {/* Mobile sidebar panel */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-[60] md:hidden transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed top-[5px] bottom-[5px] left-0 w-64 bg-gray-900 text-white flex flex-col z-[60] md:hidden transition-transform duration-300 ease-in-out rounded-xl shadow-lg overflow-hidden",
+          isOpen ? "translate-x-[5px]" : "-translate-x-full",
           className
         )}
       >

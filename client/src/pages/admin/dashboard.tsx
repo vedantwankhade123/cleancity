@@ -185,7 +185,7 @@ const AdminDashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex">
         <Sidebar />
         
-        <div className="flex-1 md:ml-64">
+        <div className="flex-1 md:ml-[calc(16rem+10px)]">
           {/* Admin Dashboard Header */}
           <header className="bg-white shadow-sm sticky top-0 z-40">
             <div className="container px-4 sm:px-6 lg:px-8">
