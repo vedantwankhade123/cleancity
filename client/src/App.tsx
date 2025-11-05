@@ -62,8 +62,10 @@ function ProtectedRoute({
 
 function Router() {
   const { fetchUser } = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [authModal, setAuthModal] = useState<{
+    isOpen: boolean;
+    type: 'login' | 'signup';
+  }>({ isOpen: false, type: 'login' });
   const [authType, setAuthType] = useState<"user" | "admin">("user");
   const [isAdminRoute] = useRoute("/admin/:any*");
 
@@ -71,12 +73,26 @@ function Router() {
     fetchUser();
   }, [fetchUser]);
 
+  const handleOpenModal = (type: 'login' | 'signup', userType: 'user' | 'admin') => {
+    setAuthType(userType);
+    setAuthModal({ isOpen: true, type });
+  };
+
+  const handleCloseModal = () => {
+    setAuthModal({ isOpen: false, type: 'login' });
+  };
+
+  const handleSwitchModal = (newModalType: 'login' | 'signup', newUserType: 'user' | 'admin') => {
+    setAuthType(newUserType);
+    setAuthModal({ isOpen: true, type: newModalType });
+  };
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className={isAdminRoute ? 'hidden' : ''}>
         <Navbar 
-          setShowLoginModal={setShowLoginModal}
-          setShowSignupModal={setShowSignupModal}
+          setShowLoginModal={(show) => handleOpenModal('login', authType)}
+          setShowSignupModal={(show) => handleOpenModal('signup', authType)}
           setAuthType={setAuthType}
         />
       </div>
@@ -84,8 +100,8 @@ function Router() {
       <Switch>
         <Route path="/air-quality">
           <AirQuality 
-            setShowLoginModal={setShowLoginModal}
-            setShowSignupModal={setShowSignupModal}
+            setShowLoginModal={(show) => handleOpenModal('login', 'user')}
+            setShowSignupModal={(show) => handleOpenModal('signup', 'user')}
             setAuthType={setAuthType}
           />
         </Route>
@@ -94,8 +110,8 @@ function Router() {
           path="/"
           component={() => (
             <Landing 
-              setShowLoginModal={setShowLoginModal}
-              setShowSignupModal={setShowSignupModal}
+              setShowLoginModal={(show) => handleOpenModal('login', 'user')}
+              setShowSignupModal={(show) => handleOpenModal('signup', 'user')}
               setAuthType={setAuthType}
             />
           )}
@@ -145,29 +161,13 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
 
-      {/* Auth Modals - Render outside Switch */}
+      {/* Auth Modal */}
       <AuthModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        type="login"
+        isOpen={authModal.isOpen}
+        onClose={handleCloseModal}
+        type={authModal.type}
         userType={authType}
-        onSwitchType={(type) => {
-          setShowLoginModal(false);
-          setShowSignupModal(true);
-          setAuthType(type);
-        }}
-      />
-
-      <AuthModal
-        isOpen={showSignupModal}
-        onClose={() => setShowSignupModal(false)}
-        type="signup"
-        userType={authType}
-        onSwitchType={(type) => {
-          setShowSignupModal(false);
-          setShowLoginModal(true);
-          setAuthType(type);
-        }}
+        onSwitchType={handleSwitchModal}
       />
     </Suspense>
   );
