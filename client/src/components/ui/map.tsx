@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
-import { LatLngExpression, LatLng, Icon } from "leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L, { LatLngExpression, LatLng } from "leaflet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, LocateFixed, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Fix for default icon issue with webpack
-import "leaflet/dist/images/marker-icon.png";
-import "leaflet/dist/images/marker-shadow.png";
+// Fix for default icon issue with Vite/Webpack
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
-const defaultIcon = new Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+const defaultIcon = new L.Icon({
+  iconUrl,
+  shadowUrl,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
@@ -74,7 +74,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   initialLongitude,
   initialAddress,
 }) => {
-  const [position, setPosition] = useState<LatLng>(new LatLng(20.9374, 77.7796)); // Default to Amravati
+  const [position, setPosition] = useState<LatLng>(new L.LatLng(20.9374, 77.7796)); // Default to Amravati
   const [mapCenter, setMapCenter] = useState<LatLngExpression>([20.9374, 77.7796]);
   const [address, setAddress] = useState(initialAddress || "Amravati, Maharashtra, India");
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,7 +83,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     if (initialLatitude && initialLongitude) {
-      const initialPos = new LatLng(parseFloat(initialLatitude), parseFloat(initialLongitude));
+      const initialPos = new L.LatLng(parseFloat(initialLatitude), parseFloat(initialLongitude));
       setPosition(initialPos);
       setMapCenter([parseFloat(initialLatitude), parseFloat(initialLongitude)]);
     }
@@ -103,7 +103,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       const data = await response.json();
       if (data && data.length > 0) {
         const { lat, lon, display_name } = data[0];
-        const newPos = new LatLng(parseFloat(lat), parseFloat(lon));
+        const newPos = new L.LatLng(parseFloat(lat), parseFloat(lon));
         setPosition(newPos);
         setMapCenter([parseFloat(lat), parseFloat(lon)]);
         setAddress(display_name);
@@ -122,7 +122,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        const newPos = new LatLng(latitude, longitude);
+        const newPos = new L.LatLng(latitude, longitude);
         setPosition(newPos);
         setMapCenter([latitude, longitude]);
         
