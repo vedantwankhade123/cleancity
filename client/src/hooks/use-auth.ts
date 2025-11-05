@@ -8,9 +8,9 @@ interface RegisterData {
   fullName: string;
   email: string;
   password: string;
-  phone: string;
-  dob: string;
-  address: string;
+  phone?: string;
+  dob?: string;
+  address?: string;
   city: string;
   state: string;
   pincode: string;
