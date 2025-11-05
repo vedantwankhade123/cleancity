@@ -6,7 +6,6 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import { insertReportSchema } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import {
@@ -28,21 +27,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { fileToBase64 } from "@/lib/utils";
-import { Image, X, FileText, Camera, MapPin, Send, Loader2 } from "lucide-react";
+import { Image, X, FileText, Camera, MapPin, Send, Loader2, Home } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import CameraComponent from "@/components/ui/camera";
-import MapComponent from "@/components/ui/map";
 import { toast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet";
 
-// Extended schema with file validation
-const reportFormSchema = insertReportSchema.extend({
-  imageFile: z.any()
-    .refine(file => 
-      file && (file instanceof File || typeof file === "string"), 
-      "Please upload an image or take a photo"
-    ),
+// Form validation schema
+const reportFormSchema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  imageFile: z.any().refine(file => file, "Please upload an image or take a photo"),
+  colony: z.string().min(3, "Colony or Area is required"),
+  houseNo: z.string().optional(),
+  landmark: z.string().min(3, "Landmark is required"),
 });
 
 type ReportFormValues = z.infer<typeof reportFormSchema>;
@@ -65,20 +64,11 @@ const ReportForm: React.FC = () => {
       title: "",
       description: "",
       imageFile: undefined,
-      latitude: "",
-      longitude: "",
-      address: "",
-      userId: user?.id || 0,
-      imageUrl: "",
+      colony: "",
+      houseNo: "",
+      landmark: "",
     },
   });
-
-  // Handle location selection
-  const handleLocationSelect = (latitude: string, longitude: string, address: string) => {
-    form.setValue("latitude", latitude);
-    form.setValue("longitude", longitude);
-    form.setValue("address", address);
-  };
 
   // Handle file input change
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,10 +142,24 @@ const ReportForm: React.FC = () => {
       return;
     }
 
-    createReportMutation.mutate({
-      ...values,
-      userId: user.id,
-    });
+    const fullAddress = [
+      values.houseNo,
+      values.colony,
+      values.landmark,
+      user.city,
+      user.pincode
+    ].filter(Boolean).join(', ');
+
+    const payload = {
+      title: values.title,
+      description: values.description,
+      imageFile: values.imageFile,
+      address: fullAddress,
+      latitude: "0",
+      longitude: "0",
+    };
+
+    createReportMutation.mutate(payload);
   };
 
   return (
@@ -306,30 +310,71 @@ const ReportForm: React.FC = () => {
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <MapPin className="h-5 w-5 text-primary" />
-                          3. Pin the Location
+                          3. Enter Location Details
                         </CardTitle>
                         <CardDescription>
-                          Use the map to mark the exact location of the waste.
+                          Please provide the exact location where the waste was found.
                         </CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="space-y-4">
                         <FormField
                           control={form.control}
-                          name="latitude"
-                          render={() => (
+                          name="colony"
+                          render={({ field }) => (
                             <FormItem>
+                              <FormLabel>Colony / Area</FormLabel>
                               <FormControl>
-                                <MapComponent
-                                  onLocationSelect={handleLocationSelect}
-                                  initialLatitude={form.getValues("latitude")}
-                                  initialLongitude={form.getValues("longitude")}
-                                  initialAddress={form.getValues("address")}
-                                />
+                                <div className="relative">
+                                  <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input placeholder="e.g., Ram Nagar" {...field} className="pl-10" />
+                                </div>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="houseNo"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>House No (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., H.No 123" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="landmark"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Landmark</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="e.g., Near City Park" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input value={user?.city || ''} disabled className="bg-gray-100" />
+                            </FormControl>
+                          </FormItem>
+                          <FormItem>
+                            <FormLabel>Pincode</FormLabel>
+                            <FormControl>
+                              <Input value={user?.pincode || ''} disabled className="bg-gray-100" />
+                            </FormControl>
+                          </FormItem>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>

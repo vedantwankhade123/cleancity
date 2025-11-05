@@ -85,16 +85,30 @@ export const reports = pgTable("reports", {
   completedAt: timestamp("completed_at"),
 });
 
-export const insertReportSchema = createInsertSchema(reports).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  status: true,
-  adminNotes: true,
-  assignedAdminId: true,
-  rewardPoints: true,
-  completedAt: true,
-});
+export const insertReportSchema = createInsertSchema(reports)
+  .omit({
+    id: true,
+    userId: true, // userId is set from session on backend
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+    adminNotes: true,
+    assignedAdminId: true,
+    rewardPoints: true,
+    completedAt: true,
+  })
+  .extend({
+    // Make latitude and longitude optional - allow empty strings
+    latitude: z.union([z.string().min(1), z.literal("")]).optional(),
+    longitude: z.union([z.string().min(1), z.literal("")]).optional(),
+  })
+  .refine((data) => {
+    // At minimum, address must be provided
+    return data.address && data.address.trim().length > 0;
+  }, {
+    message: "Address is required",
+    path: ["address"],
+  });
 
 export const updateReportStatusSchema = z.object({
   status: z.enum(["pending", "processing", "completed", "rejected"]),

@@ -198,13 +198,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
         setError(null);
         try {
           const city = signupForm.getValues('city');
-          const response = await fetch(`/api/auth/check-admin?city=${encodeURIComponent(city)}`);
+          const state = signupForm.getValues('state');
+          const pincode = signupForm.getValues('pincode');
+          
+          if (!city || !state || !pincode) {
+            setError('Please fill in all location fields (city, state, pincode)');
+            setIsCheckingAdmin(false);
+            return;
+          }
+          
+          const response = await fetch(
+            `/api/auth/check-admin?city=${encodeURIComponent(city)}&state=${encodeURIComponent(state)}&pincode=${encodeURIComponent(pincode)}`
+          );
           if (!response.ok) throw new Error('Failed to check admin status');
           const data = await response.json();
           setAdminExists(data.exists);
           setStep(prev => prev + 1);
         } catch (e: any) {
-          setError(e.message || "Could not verify city's admin status. Please try again.");
+          setError(e.message || "Could not verify location's admin status. Please try again.");
         } finally {
           setIsCheckingAdmin(false);
         }
@@ -224,12 +235,45 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const onLoginSubmit = async (values: LoginFormValues) => {
     setError(null)
     try {
-      await login({
-        email: values.email,
-        password: values.password,
-        role: userType,
-      })
-      // On success, the useAuth hook will handle redirection, so we don't need to call handleClose()
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          role: userType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Check if it's a request status response (403 for pending/rejected admin requests)
+        if (data.requestStatus) {
+          setError(data.message || 'Admin request status check');
+          return;
+        }
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Check if response contains request status (shouldn't happen with 200, but just in case)
+      if (data.requestStatus) {
+        setError(data.message || 'Admin request status check');
+        return;
+      }
+
+      // Normal login success - session is already set by the server, just redirect
+      handleClose()
+      
+      // Redirect to appropriate dashboard
+      if (data.role === "admin") {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/user/dashboard";
+      }
     } catch (err: any) {
       let errorMessage = 'Failed to login.';
       try {
@@ -246,6 +290,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setError(null)
     try {
       const { confirmPassword, ...registerData } = values
+      
+      // For admin signup, only include secretCode if no admin exists (first admin)
+      if (userType === 'admin' && adminExists === true) {
+        // Remove secretCode when submitting a request (admin already exists)
+        delete registerData.secretCode;
+      }
+      
       await register({ ...registerData, role: userType })
       handleClose()
     } catch (err: any) {
@@ -547,7 +598,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         </div>
                       </FormControl>
                       <p className='text-xs text-gray-500 mt-1'>
-                        Required for the first admin of a city.
+                        Required for the first admin of this location (city, state, pincode).
                       </p>
                       <FormMessage />
                     </FormItem>
@@ -560,7 +611,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <ShieldCheck className="h-4 w-4 text-blue-600" />
                   <AlertTitle className="text-blue-800">Admin Exists</AlertTitle>
                   <AlertDescription className="text-blue-700">
-                    An admin already exists for {signupForm.getValues('city')}. Your request will be sent for approval.
+                    An admin already exists for {signupForm.getValues('city')}, {signupForm.getValues('state')} - {signupForm.getValues('pincode')}. 
+                    Your request will be sent to the super admin for approval.
                   </AlertDescription>
                 </Alert>
               )}
@@ -883,7 +935,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           <Loader2 className='h-4 w-4 animate-spin mr-2' />
                         )}
                         {userType === 'admin' 
-                          ? (adminExists ? 'Submit Request' : 'Create Account') 
+                          ? (adminExists === true ? 'Submit Request' : 'Create Account') 
                           : 'Create Account'}
                       </Button>
                     )}
