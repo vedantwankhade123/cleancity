@@ -58,16 +58,14 @@ const signupSchema = z
     confirmPassword: z
       .string()
       .min(6, 'Password must be at least 6 characters'),
-    phone: z.string().min(10, 'Phone number must be at least 10 characters'),
+    phone: z.string().min(10, 'Phone number must be at least 10 characters').optional(),
     dob: z
       .string()
       .refine(
-        val =>
-          new Date(val) <=
-          new Date(new Date().setFullYear(new Date().getFullYear() - 13)),
+        val => !val || (new Date(val) <= new Date(new Date().setFullYear(new Date().getFullYear() - 13))),
         'You must be at least 13 years old',
-      ),
-    address: z.string().min(3, 'Address must be at least 3 characters'),
+      ).optional(),
+    address: z.string().min(3, 'Address must be at least 3 characters').optional(),
     city: z.string().min(2, 'City must be at least 2 characters'),
     state: z.string().min(2, 'State must be at least 2 characters'),
     pincode: z.string().min(5, 'Pincode must be at least 5 characters'),
@@ -108,11 +106,6 @@ const adminStepConfig = [
     title: 'Account Details',
     icon: <User className='h-5 w-5' />,
     fields: ['fullName', 'email', 'password', 'confirmPassword'],
-  },
-  {
-    title: 'Personal Info',
-    icon: <FileText className='h-5 w-5' />,
-    fields: ['dob', 'phone', 'address'],
   },
   {
     title: 'Location',
@@ -364,6 +357,74 @@ const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )
       case 2:
+        if (userType === 'admin') {
+          return (
+            <div className='space-y-4'>
+              <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+                <FormField
+                  control={signupForm.control}
+                  name='city'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                          <Input
+                            placeholder='City'
+                            {...field}
+                            className='pl-10'
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={signupForm.control}
+                  name='state'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State</FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                          <Input
+                            placeholder='State'
+                            {...field}
+                            className='pl-10'
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={signupForm.control}
+                  name='pincode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pincode</FormLabel>
+                      <FormControl>
+                        <div className='relative'>
+                          <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                          <Input
+                            placeholder='123456'
+                            {...field}
+                            className='pl-10'
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )
+        }
         return (
           <div className='space-y-4'>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
@@ -427,6 +488,58 @@ const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )
       case 3:
+        if (userType === 'admin') {
+          return (
+            <div className='space-y-4'>
+              <FormField
+                control={signupForm.control}
+                name='secretCode'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Secret Code</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                        <Input
+                          placeholder='Enter secret code'
+                          {...field}
+                          required
+                          className='pl-10'
+                        />
+                      </div>
+                    </FormControl>
+                    <p className='text-xs text-gray-500 mt-1'>
+                      This code is provided by the system manager.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={signupForm.control}
+                name='termsAccepted'
+                render={({ field }) => (
+                  <FormItem className='flex items-start space-x-2 space-y-0 pt-2'>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className='mt-1'
+                      />
+                    </FormControl>
+                    <FormLabel className='text-sm font-normal cursor-pointer'>
+                      I accept the{' '}
+                      <a href='#' className='underline'>
+                        Terms and Conditions
+                      </a>
+                    </FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )
+        }
         return (
           <div className='space-y-4'>
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
@@ -491,59 +604,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 )}
               />
             </div>
-            {userType === 'user' && (
-              <FormField
-                control={signupForm.control}
-                name='termsAccepted'
-                render={({ field }) => (
-                  <FormItem className='flex items-start space-x-2 space-y-0 pt-2'>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className='mt-1'
-                      />
-                    </FormControl>
-                    <FormLabel className='text-sm font-normal cursor-pointer'>
-                      I accept the{' '}
-                      <a href='#' className='underline'>
-                        Terms and Conditions
-                      </a>
-                    </FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-        )
-      case 4:
-        return (
-          <div className='space-y-4'>
-            <FormField
-              control={signupForm.control}
-              name='secretCode'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Admin Secret Code</FormLabel>
-                  <FormControl>
-                    <div className='relative'>
-                      <KeyRound className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                      <Input
-                        placeholder='Enter secret code'
-                        {...field}
-                        required
-                        className='pl-10'
-                      />
-                    </div>
-                  </FormControl>
-                  <p className='text-xs text-gray-500 mt-1'>
-                    This code is provided by the system manager.
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={signupForm.control}
               name='termsAccepted'
