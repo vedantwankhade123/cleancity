@@ -64,20 +64,6 @@ const HowItWorksSection: React.FC = () => {
         </div>
 
         <div className="relative">
-          {/* Desktop connecting lines */}
-          <div className="hidden md:flex absolute top-1/2 left-0 w-full h-1 -translate-y-1/2 mt-[-40px]">
-            <div className="w-full bg-gray-200 rounded-full h-1 relative">
-              <motion.div
-                className="bg-primary h-1 rounded-full"
-                initial={{ width: "0%" }}
-                animate={{
-                  width: `${(activeIndex / (steps.length - 1)) * 100}%`,
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-              />
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
             {steps.map((step, index) => (
               <motion.div
