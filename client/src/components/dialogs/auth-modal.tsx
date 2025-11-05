@@ -161,8 +161,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [step, setStep] = useState(1)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  // New state for admin check
   const [adminExists, setAdminExists] = useState<boolean | null>(null);
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
 
@@ -192,51 +190,36 @@ const AuthModal: React.FC<AuthModalProps> = ({
     },
   })
 
-  const cityValue = signupForm.watch('city');
-
-  // Effect to check for existing admin when city changes
-  React.useEffect(() => {
-    if (!isOpen) {
-      setAdminExists(null);
-      return;
-    }
-    
-    if (!cityValue || userType !== 'admin') {
-      setAdminExists(null);
-      return;
-    }
-
-    const checkAdminStatus = async () => {
-      setIsCheckingAdmin(true);
-      setAdminExists(null);
-      try {
-        const response = await fetch(`/api/auth/check-admin?city=${encodeURIComponent(cityValue)}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setAdminExists(data.exists);
-      } catch (e) {
-        console.error("Failed to check admin status", e);
-        setAdminExists(null);
-      } finally {
-        setIsCheckingAdmin(false);
-      }
-    };
-
-    const timer = setTimeout(() => {
-      checkAdminStatus();
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [cityValue, userType, isOpen]);
-
   const handleNext = async () => {
-    const isValid = await signupForm.trigger(currentStepInfo.fields as any)
-    if (isValid && step < totalSteps) {
-      setStep(prev => prev + 1)
+    const isValid = await signupForm.trigger(currentStepInfo.fields as any);
+    if (isValid) {
+      if (step === 2 && userType === 'admin') {
+        setIsCheckingAdmin(true);
+        setError(null);
+        try {
+          const city = signupForm.getValues('city');
+          const response = await fetch(`/api/auth/check-admin?city=${encodeURIComponent(city)}`);
+          if (!response.ok) throw new Error('Failed to check admin status');
+          const data = await response.json();
+          setAdminExists(data.exists);
+          setStep(prev => prev + 1);
+        } catch (e: any) {
+          setError(e.message || "Could not verify city's admin status. Please try again.");
+        } finally {
+          setIsCheckingAdmin(false);
+        }
+      } else if (step < totalSteps) {
+        setStep(prev => prev + 1);
+      }
     }
-  }
+  };
 
-  const handleBack = () => setStep(prev => prev - 1)
+  const handleBack = () => {
+    if (step === 3 && userType === 'admin') {
+      setAdminExists(null);
+    }
+    setStep(prev => prev - 1);
+  };
 
   const onLoginSubmit = async (values: LoginFormValues) => {
     setError(null)
@@ -546,13 +529,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
         if (userType === 'admin') {
           return (
             <div className='space-y-4'>
-              {isCheckingAdmin && (
-                <div className="flex items-center text-sm text-gray-500 p-2 rounded-md bg-gray-50">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Checking admin status for {cityValue}...
-                </div>
-              )}
-
               {adminExists === false && (
                 <FormField
                   control={signupForm.control}
@@ -584,7 +560,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <ShieldCheck className="h-4 w-4 text-blue-600" />
                   <AlertTitle className="text-blue-800">Admin Exists</AlertTitle>
                   <AlertDescription className="text-blue-700">
-                    An admin already exists for {cityValue}. Your request will be sent for approval.
+                    An admin already exists for {signupForm.getValues('city')}. Your request will be sent for approval.
                   </AlertDescription>
                 </Alert>
               )}
@@ -896,8 +872,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         type='button'
                         onClick={handleNext}
                         className='gap-2'
+                        disabled={isCheckingAdmin}
                       >
-                        Next <ArrowRight className='h-4 w-4' />
+                        {isCheckingAdmin ? <Loader2 className='h-4 w-4 animate-spin' /> : 'Next'}
+                        {!isCheckingAdmin && <ArrowRight className='h-4 w-4' />}
                       </Button>
                     ) : (
                       <Button type='submit' disabled={isLoading || isCheckingAdmin}>
