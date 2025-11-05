@@ -193,7 +193,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, type, userType, 
               alt={type === 'login' ? 'Login illustration' : 'Signup illustration'}
               className={cn(
                 "absolute inset-0 w-full h-full",
-                type === 'login' ? "object-contain p-8" : "object-cover"
+                type === 'login' ? "object-contain py-8 px-4" : "object-cover"
               )}
             />
           </div>
