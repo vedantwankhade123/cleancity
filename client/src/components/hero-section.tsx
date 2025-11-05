@@ -130,7 +130,7 @@ const HeroSection: React.FC = () => {
             <img 
               src="/cleancity hero.png" 
               alt="Clean City Illustration" 
-              className="w-full max-w-xl h-auto"
+              className="w-full max-w-2xl h-auto"
             />
           </motion.div>
         </div>
