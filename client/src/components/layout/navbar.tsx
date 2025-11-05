@@ -101,18 +101,13 @@ const Navbar: React.FC<NavbarProps> = ({
   );
 
   const linkClass = (path: string) => cn(
-    "transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium",
-    (isHomePage && !scrolled)
-      ? "text-white hover:bg-white/10"
-      : "text-gray-700 hover:bg-gray-100",
+    "transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100",
     location === path && !(isHomePage && !scrolled) && "bg-gray-100 text-primary"
   );
 
   const buttonClass = cn(
     "transition-all duration-300 hover:scale-105",
-    (isHomePage && !scrolled)
-      ? "border-white text-white hover:bg-white hover:text-primary"
-      : "border-primary text-primary hover:bg-primary hover:text-white"
+    "border-primary text-primary hover:bg-primary hover:text-white"
   );
 
   const primaryButtonClass = cn(
@@ -137,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-2xl font-bold transition-transform hover:scale-105">
-              <span className={cn("text-primary", isHomePage && !scrolled && "text-white")}>Clean</span>
+              <span className="text-primary">Clean</span>
               <span className="text-secondary">City</span>
             </Link>
 
@@ -156,7 +151,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <div className="flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className={cn("relative", (isHomePage && !scrolled) ? "text-white hover:bg-white/10" : "text-gray-700 hover:bg-gray-100")}>
+                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
                         <Bell className="h-5 w-5" />
                         {notifications && notifications.length > 0 && (
                           <span className="absolute top-1 right-1 bg-accent text-white rounded-full w-4 h-4 text-xs flex items-center justify-center" />
@@ -179,9 +174,9 @@ const Navbar: React.FC<NavbarProps> = ({
                   </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className={cn("flex items-center gap-2 px-2", (isHomePage && !scrolled) ? "text-white hover:bg-white/10" : "text-gray-700 hover:bg-gray-100")}>
+                      <Button variant="ghost" className="flex items-center gap-2 px-2 text-gray-700 hover:bg-gray-100">
                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"><User className="h-4 w-4" /></div>
-                        <span className={cn((isHomePage && !scrolled) ? "text-white" : "text-gray-700")}>{user?.fullName?.split(" ")[0]}</span>
+                        <span className="text-gray-700">{user?.fullName?.split(" ")[0]}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
@@ -202,7 +197,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
             <div className="md:hidden">
               <Button variant="ghost" size="icon" onClick={toggleMenu}>
-                <Menu className={cn("h-6 w-6", (isHomePage && !scrolled) ? "text-white" : "text-gray-700")} />
+                <Menu className="h-6 w-6 text-gray-700" />
               </Button>
             </div>
           </div>
