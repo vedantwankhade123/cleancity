@@ -113,10 +113,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const SidebarContent = () => (
     <>
       <div className="flex items-center justify-center h-16 border-b border-gray-800">
-        <Link href="/">
-          <a className="text-primary text-2xl font-bold">
-            Clean<span className="text-secondary">City</span>
-          </a>
+        <Link href="/" className="text-primary text-2xl font-bold">
+          Clean<span className="text-secondary">City</span>
         </Link>
       </div>
       
@@ -127,11 +125,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
           </div>
           
           {navLinks.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a className={getLinkStyles(link.href)}>
-                {link.icon}
-                <span>{link.label}</span>
-              </a>
+            <Link key={link.href} href={link.href} className={getLinkStyles(link.href)}>
+              {link.icon}
+              <span>{link.label}</span>
             </Link>
           ))}
           
