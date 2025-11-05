@@ -42,9 +42,9 @@ const RewardsSection: React.FC = () => {
   ];
 
   const redeemOptions = [
-    { points: 500, reward: "₹5 Cash Reward" },
-    { points: 1000, reward: "₹12 Cash Reward" },
-    { points: 2500, reward: "₹35 Cash Reward" },
+    { points: 500, reward: "₹50 Cash Reward" },
+    { points: 1000, reward: "₹100 Cash Reward" },
+    { points: 2500, reward: "₹250 Cash Reward" },
   ];
 
   return (

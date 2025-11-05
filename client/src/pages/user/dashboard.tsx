@@ -152,7 +152,7 @@ const UserDashboard: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">₹5 Cash Reward</h5>
+                        <h5 className="font-medium">₹50 Cash Reward</h5>
                         <p className="text-sm text-gray-500">500 points required</p>
                       </div>
                       <Button 
@@ -165,7 +165,7 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">₹12 Cash Reward</h5>
+                        <h5 className="font-medium">₹100 Cash Reward</h5>
                         <p className="text-sm text-gray-500">1000 points required</p>
                       </div>
                       <Button 
@@ -178,7 +178,7 @@ const UserDashboard: React.FC = () => {
                     
                     <div className="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
                       <div>
-                        <h5 className="font-medium">₹35 Cash Reward</h5>
+                        <h5 className="font-medium">₹250 Cash Reward</h5>
                         <p className="text-sm text-gray-500">2500 points required</p>
                       </div>
                       <Button 

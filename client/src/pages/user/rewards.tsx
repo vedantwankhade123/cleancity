@@ -155,12 +155,12 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">₹500 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹50 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">500 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(500, "₹500")}
+                              onClick={() => handleRedeemReward(500, "₹50")}
                               disabled={!totalPoints || totalPoints < 500}
                             >
                               Redeem
@@ -177,12 +177,12 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">₹1000 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹100 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">1000 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(1000, "₹1000")}
+                              onClick={() => handleRedeemReward(1000, "₹100")}
                               disabled={!totalPoints || totalPoints < 1000}
                             >
                               Redeem
@@ -199,56 +199,12 @@ const UserRewards: React.FC = () => {
                                 <Coins className="h-6 w-6" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold">₹2500 Cash Reward</h3>
+                                <h3 className="text-lg font-semibold">₹250 Cash Reward</h3>
                                 <p className="text-sm text-gray-500">2500 points</p>
                               </div>
                             </div>
                             <Button
-                              onClick={() => handleRedeemReward(2500, "₹2500")}
-                              disabled={!totalPoints || totalPoints < 2500}
-                            >
-                              Redeem
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                <Coins className="h-6 w-6" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-semibold">₹1000 Cash Reward</h3>
-                                <p className="text-sm text-gray-500">1000 points</p>
-                              </div>
-                            </div>
-                            <Button
-                              onClick={() => handleRedeemReward(1000, "₹1000")}
-                              disabled={!totalPoints || totalPoints < 1000}
-                            >
-                              Redeem
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card>
-                        <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                <Coins className="h-6 w-6" />
-                              </div>
-                              <div>
-                                <h3 className="text-lg font-semibold">₹2500 Cash Reward</h3>
-                                <p className="text-sm text-gray-500">2500 points</p>
-                              </div>
-                            </div>
-                            <Button
-                              onClick={() => handleRedeemReward(2500, "₹2500")}
+                              onClick={() => handleRedeemReward(2500, "₹250")}
                               disabled={!totalPoints || totalPoints < 2500}
                             >
                               Redeem
