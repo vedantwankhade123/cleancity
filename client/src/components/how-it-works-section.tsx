@@ -63,27 +63,13 @@ const HowItWorksSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="relative">
-          {/* Desktop connecting lines */}
-          <div className="hidden md:block absolute top-10 left-0 w-full h-1 z-0">
-            <div className="w-3/4 h-full bg-gray-200 rounded-full mx-auto relative">
+        {/* Desktop View with Connectors */}
+        <div className="hidden md:flex items-start justify-center w-full">
+          {steps.map((step, index) => (
+            <React.Fragment key={index}>
               <motion.div
-                className="bg-primary h-1 rounded-full"
-                initial={{ width: "0%" }}
-                animate={{
-                  width: `${(activeIndex / (steps.length - 1)) * 100}%`,
-                }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
                 onClick={() => handleStepClick(index)}
-                className="text-center p-6 rounded-xl cursor-pointer border-2"
+                className="text-center p-6 rounded-xl cursor-pointer w-64 flex-shrink-0"
                 animate={activeIndex === index ? "active" : "inactive"}
                 variants={{
                   active: {
@@ -119,8 +105,65 @@ const HowItWorksSection: React.FC = () => {
                   <p className="text-gray-600 px-2 text-sm">{step.description}</p>
                 </motion.div>
               </motion.div>
-            ))}
-          </div>
+
+              {index < steps.length - 1 && (
+                <div className="relative flex-1 h-1 mt-10">
+                  <div className="bg-gray-200 h-full w-full rounded-full" />
+                  <motion.div
+                    className="bg-primary h-full absolute top-0 left-0 rounded-full"
+                    initial={{ width: "0%" }}
+                    animate={{ width: activeIndex > index ? "100%" : "0%" }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Mobile View */}
+        <div className="grid grid-cols-1 md:hidden gap-8">
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              onClick={() => handleStepClick(index)}
+              className="text-center p-6 rounded-xl cursor-pointer border-2"
+              animate={activeIndex === index ? "active" : "inactive"}
+              variants={{
+                active: {
+                  scale: 1.05,
+                  borderColor: "hsl(var(--primary))",
+                  backgroundColor: "hsl(var(--background))",
+                  boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                },
+                inactive: {
+                  scale: 1,
+                  borderColor: "transparent",
+                  backgroundColor: "transparent",
+                  boxShadow: "0 0 #0000",
+                },
+              }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
+              <div
+                className={cn(
+                  "w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center transition-colors duration-500",
+                  activeIndex === index
+                    ? "bg-primary text-white"
+                    : "bg-white text-primary"
+                )}
+              >
+                <step.icon className="w-10 h-10" />
+              </div>
+              <motion.div
+                animate={{ opacity: activeIndex === index ? 1 : 0.7 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                <p className="text-gray-600 px-2 text-sm">{step.description}</p>
+              </motion.div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
