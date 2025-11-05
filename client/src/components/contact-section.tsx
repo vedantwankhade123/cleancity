@@ -103,6 +103,7 @@ const ContactSection: React.FC = () => {
                               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                               <Input 
                                 {...field} 
+                                placeholder="e.g. John Doe"
                                 className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
                               />
                             </div>
@@ -124,6 +125,7 @@ const ContactSection: React.FC = () => {
                               <Input 
                                 type="email" 
                                 {...field} 
+                                placeholder="e.g. john.doe@example.com"
                                 className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
                               />
                             </div>
@@ -145,6 +147,7 @@ const ContactSection: React.FC = () => {
                             <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                             <Input 
                               {...field} 
+                              placeholder="e.g. Partnership Inquiry"
                               className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
                             />
                           </div>
@@ -167,6 +170,7 @@ const ContactSection: React.FC = () => {
                               className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 pt-3 focus:border-primary focus:ring-primary placeholder:text-gray-500 resize-none" 
                               rows={4} 
                               {...field} 
+                              placeholder="Enter your message here..."
                             />
                           </div>
                         </FormControl>
