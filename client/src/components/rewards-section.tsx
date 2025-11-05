@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CheckCircle, Coins, Gift, Star } from "lucide-react";
+import { CheckCircle, Coins, Gift, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,21 +23,21 @@ const RewardsSection: React.FC = () => {
   const earningMethods = [
     {
       title: "Submit a Report",
-      points: "50 points",
-      description: "For each verified waste report you submit.",
-      icon: <Gift className="h-6 w-6 text-primary" />,
+      points: "+50 points",
+      description: "For each verified waste report.",
+      icon: Gift,
     },
     {
       title: "Add Detailed Info",
-      points: "25 bonus points",
-      description: "For reports with clear photos and descriptions.",
-      icon: <CheckCircle className="h-6 w-6 text-primary" />,
+      points: "+25 bonus",
+      description: "For reports with clear photos.",
+      icon: CheckCircle,
     },
     {
       title: "Monthly Streak",
-      points: "100 bonus points",
-      description: "Submit 5 verified reports in a single month.",
-      icon: <Star className="h-6 w-6 text-primary" />,
+      points: "+100 bonus",
+      description: "For 5+ reports in a month.",
+      icon: Star,
     },
   ];
 
@@ -49,116 +49,99 @@ const RewardsSection: React.FC = () => {
 
   return (
     <>
-      <section id="rewards" className="py-20 bg-gray-50">
+      <section id="rewards" className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="max-w-4xl mx-auto text-center mb-16"
+            className="max-w-4xl mx-auto text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Your Contributions, Rewarded
+              Your Contributions, <span className="gradient-text">Rewarded.</span>
             </h2>
             <p className="text-lg text-gray-600">
               Earn points for every action that helps make our cities cleaner,
-              and redeem them for exciting rewards.
+              and redeem them for cash rewards.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
-            {/* How to Earn Card */}
-            <motion.div
-              className="lg:col-span-3"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Card className="h-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-2xl">How to Earn Points</CardTitle>
-                  <CardDescription>
-                    Start making an impact and collecting points today.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-6">
+          <motion.div
+            className="max-w-5xl mx-auto"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Card className="overflow-hidden shadow-lg border-gray-200">
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                {/* Left Side: How to Earn */}
+                <div className="p-8">
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-6">How to Earn Points</h3>
+                  <div className="grid grid-cols-1 gap-6">
                     {earningMethods.map((method, index) => (
-                      <li key={index} className="flex items-start space-x-4">
+                      <div key={index} className="flex items-center space-x-4">
                         <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                          {method.icon}
+                          <method.icon className="h-6 w-6 text-primary" />
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-800">
-                            {method.title}
-                          </h4>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-semibold text-gray-800">
+                              {method.title}
+                            </h4>
+                            <p className="text-primary font-bold text-sm">
+                              {method.points}
+                            </p>
+                          </div>
                           <p className="text-gray-600 text-sm">
                             {method.description}
                           </p>
-                          <p className="text-primary font-bold text-sm mt-1">
-                            {method.points}
-                          </p>
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Redeem Points Card */}
-            <motion.div
-              className="lg:col-span-2"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Card className="h-full bg-gray-900 text-white shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-white">
-                    Redeem Your Points
-                  </CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Turn your points into real cash rewards.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <div className="space-y-4">
-                    {redeemOptions.map((option, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-gray-800 rounded-lg"
-                      >
-                        <div>
-                          <h4 className="font-semibold text-lg">
-                            {option.reward}
-                          </h4>
-                          <p className="text-gray-400 text-sm">
-                            {option.points.toLocaleString()} points
-                          </p>
-                        </div>
-                        <Coins className="h-6 w-6 text-accent" />
                       </div>
                     ))}
                   </div>
-                </CardContent>
-                {!isAuthenticated && (
-                  <div className="p-6 mt-auto">
-                    <Button
-                      onClick={handleSignupClick}
-                      className="w-full py-3 bg-primary hover:bg-primary/90 text-white font-semibold transition-transform hover:scale-105"
-                      size="lg"
-                    >
-                      Sign Up to Start Earning
-                    </Button>
+                </div>
+
+                {/* Right Side: Redeem Points */}
+                <div className="bg-gray-50 p-8 flex flex-col">
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-6">Redeem for Rewards</h3>
+                  <div className="space-y-4 flex-grow">
+                    {redeemOptions.map((option, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Coins className="h-5 w-5 text-accent" />
+                          <div>
+                            <h4 className="font-semibold">
+                              {option.reward}
+                            </h4>
+                            <p className="text-gray-500 text-sm">
+                              {option.points.toLocaleString()} points
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </Card>
-            </motion.div>
-          </div>
+                  {!isAuthenticated && (
+                    <div className="mt-8">
+                      <Button
+                        onClick={handleSignupClick}
+                        className="w-full py-3 bg-primary hover:bg-primary/90 text-white font-semibold transition-transform hover:scale-105 gap-2"
+                        size="lg"
+                      >
+                        Sign Up to Start Earning
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
         </div>
       </section>
 
