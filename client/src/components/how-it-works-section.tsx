@@ -107,7 +107,7 @@ const HowItWorksSection: React.FC = () => {
               </motion.div>
 
               {index < steps.length - 1 && (
-                <div className="relative flex-1 h-1 mt-10">
+                <div className="relative flex-1 h-0.5 mt-10 -translate-y-1/2">
                   <div className="bg-gray-200 h-full w-full rounded-full" />
                   <motion.div
                     className="bg-primary h-full absolute top-0 left-0 rounded-full"
