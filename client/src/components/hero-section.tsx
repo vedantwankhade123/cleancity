@@ -56,10 +56,10 @@ const HeroSection: React.FC = () => {
   return (
     <section id="home" className="relative w-full bg-gradient-to-br from-gray-50 via-white to-green-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-8 items-center min-h-screen pt-24 md:pt-0">
+        <div className="grid md:grid-cols-5 gap-8 items-center min-h-screen pt-24 md:pt-0">
           {/* Left Column: Text Content */}
           <motion.div
-            className="text-left flex flex-col justify-center"
+            className="md:col-span-2 text-left flex flex-col justify-center"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -122,7 +122,7 @@ const HeroSection: React.FC = () => {
 
           {/* Right Column: Illustration */}
           <motion.div 
-            className="flex items-center justify-center"
+            className="md:col-span-3 flex items-center justify-center"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -130,7 +130,7 @@ const HeroSection: React.FC = () => {
             <img 
               src="/cleancity hero.png" 
               alt="Clean City Illustration" 
-              className="w-full max-w-4xl h-auto"
+              className="w-full h-auto"
             />
           </motion.div>
         </div>
