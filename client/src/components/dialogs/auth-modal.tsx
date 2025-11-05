@@ -1,4 +1,4 @@
-import React, 'useState' from 'react'
+import React, { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -550,7 +550,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 'absolute inset-0 w-full h-full',
                 type === 'login'
                   ? 'object-contain py-8 px-2'
-                  : 'object-cover px-2',
+                  : 'object-cover px-4',
               )}
             />
           </div>
