@@ -429,66 +429,68 @@ const AuthModal: React.FC<AuthModalProps> = ({
       case 3:
         return (
           <div className='space-y-4'>
-            <FormField
-              control={signupForm.control}
-              name='city'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <div className='relative'>
-                      <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                      <Input
-                        placeholder='City'
-                        {...field}
-                        className='pl-10'
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={signupForm.control}
-              name='state'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <div className='relative'>
-                      <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                      <Input
-                        placeholder='State'
-                        {...field}
-                        className='pl-10'
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={signupForm.control}
-              name='pincode'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pincode</FormLabel>
-                  <FormControl>
-                    <div className='relative'>
-                      <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
-                      <Input
-                        placeholder='123456'
-                        {...field}
-                        className='pl-10'
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+              <FormField
+                control={signupForm.control}
+                name='city'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                        <Input
+                          placeholder='City'
+                          {...field}
+                          className='pl-10'
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={signupForm.control}
+                name='state'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                        <Input
+                          placeholder='State'
+                          {...field}
+                          className='pl-10'
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={signupForm.control}
+                name='pincode'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pincode</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <MapPin className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400' />
+                        <Input
+                          placeholder='123456'
+                          {...field}
+                          className='pl-10'
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             {userType === 'user' && (
               <FormField
                 control={signupForm.control}
