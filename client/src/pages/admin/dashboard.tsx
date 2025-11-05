@@ -25,7 +25,7 @@ import { Link } from "wouter";
 import { Helmet } from "react-helmet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { DateRange } from "react-day-picker";
+import { DateRange, DayContent, type DayContentProps } from "react-day-picker";
 import { format } from "date-fns";
 
 const AdminDashboard: React.FC = () => {
@@ -52,6 +52,56 @@ const AdminDashboard: React.FC = () => {
     queryKey: ["/api/users"],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  // Process reports to create a map of events by date
+  const reportEventsByDate = React.useMemo(() => {
+    if (!reports) return {};
+    
+    const events: Record<string, Set<string>> = {};
+
+    reports.forEach(report => {
+      // Submitted (blue)
+      const createdDate = format(new Date(report.createdAt), 'yyyy-MM-dd');
+      if (!events[createdDate]) events[createdDate] = new Set();
+      events[createdDate].add('submitted');
+
+      // Completed (green)
+      if (report.completedAt) {
+        const completedDate = format(new Date(report.completedAt), 'yyyy-MM-dd');
+        if (!events[completedDate]) events[completedDate] = new Set();
+        events[completedDate].add('completed');
+      }
+
+      // Processing (yellow) & Rejected (red)
+      if (report.status === 'processing' || report.status === 'rejected') {
+         const updatedDate = format(new Date(report.updatedAt), 'yyyy-MM-dd');
+         if (!events[updatedDate]) events[updatedDate] = new Set();
+         events[updatedDate].add(report.status);
+      }
+    });
+
+    return events;
+  }, [reports]);
+
+  // Custom DayContent component to render dots
+  function DayContentWithDots(props: DayContentProps) {
+    const dayString = format(props.date, 'yyyy-MM-dd');
+    const events = reportEventsByDate[dayString];
+
+    return (
+      <div className="relative h-full w-full flex items-center justify-center">
+        <DayContent {...props} />
+        {events && (
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex space-x-1">
+            {events.has('submitted') && <div className="h-1.5 w-1.5 rounded-full bg-blue-500" title="Report Submitted" />}
+            {events.has('processing') && <div className="h-1.5 w-1.5 rounded-full bg-yellow-500" title="Report Processing" />}
+            {events.has('rejected') && <div className="h-1.5 w-1.5 rounded-full bg-red-500" title="Report Rejected" />}
+            {events.has('completed') && <div className="h-1.5 w-1.5 rounded-full bg-green-500" title="Report Completed" />}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Filter reports based on selected date range
   const filteredReports = React.useMemo(() => {
@@ -148,7 +198,10 @@ const AdminDashboard: React.FC = () => {
                         defaultMonth={date?.from}
                         selected={date}
                         onSelect={setDate}
-                        numberOfMonths={2}
+                        numberOfMonths={1}
+                        components={{
+                          DayContent: DayContentWithDots,
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
