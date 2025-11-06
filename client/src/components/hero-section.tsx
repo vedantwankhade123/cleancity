@@ -79,13 +79,13 @@ const HeroSection: React.FC = () => {
               issues in your community with CleanCity.
             </motion.p>
             <motion.div
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-4 w-full"
               variants={itemVariants}
             >
               <Button
                 onClick={handleReportWaste}
                 size="lg"
-                className="px-8 py-6 bg-primary hover:bg-primary-dark text-white text-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                className="w-full px-8 py-6 bg-primary hover:bg-primary-dark text-white text-lg font-semibold shadow-lg transition-transform hover:scale-105"
               >
                 Get Started <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -93,7 +93,7 @@ const HeroSection: React.FC = () => {
                 onClick={handleAdminLogin}
                 variant="outline"
                 size="lg"
-                className="px-8 py-6 bg-transparent text-primary border-primary hover:bg-primary/5 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
+                className="w-full px-8 py-6 bg-transparent text-primary border-primary hover:bg-primary/5 text-lg font-semibold shadow-lg transition-transform hover:scale-105"
               >
                 Admin Login
               </Button>
