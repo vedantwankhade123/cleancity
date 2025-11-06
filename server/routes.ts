@@ -91,6 +91,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Air quality route
   apiRouter.use('/air-quality', airQualityRouter);
 
+  // Public stats route
+  apiRouter.get("/stats/public", async (req, res) => {
+    try {
+      const [totalUsers, totalReports, resolvedReports] = await Promise.all([
+        storage.getTotalUserCount(),
+        storage.getTotalReportCount(),
+        storage.getResolvedReportCount(),
+      ]);
+      res.json({ totalUsers, totalReports, resolvedReports });
+    } catch (error) {
+      console.error("Get public stats error:", error);
+      res.status(500).json({ message: "Failed to fetch public stats" });
+    }
+  });
+
   // Auth routes
   // --------------------
 

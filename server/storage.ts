@@ -59,6 +59,11 @@ export interface IStorage {
   // Notification operations
   getAdminNotifications(city: string): Promise<Report[]>;
   getUserNotifications(userId: number): Promise<Report[]>;
+
+  // Public stats
+  getTotalUserCount(): Promise<number>;
+  getTotalReportCount(): Promise<number>;
+  getResolvedReportCount(): Promise<number>;
 }
 
 // In-memory storage implementation (for reference/testing)
@@ -110,6 +115,9 @@ export class MemStorage implements IStorage {
     // Mock implementation
     return [];
   }
+  async getTotalUserCount(): Promise<number> { return 0; }
+  async getTotalReportCount(): Promise<number> { return 0; }
+  async getResolvedReportCount(): Promise<number> { return 0; }
   // ... (rest of MemStorage implementation)
 }
 

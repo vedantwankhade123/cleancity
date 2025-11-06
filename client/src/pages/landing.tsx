@@ -3,6 +3,7 @@ import Footer from "@/components/layout/footer";
 import HeroSection from "@/components/hero-section";
 import AboutSection from "@/components/about-section";
 import HowItWorksSection from "@/components/how-it-works-section";
+import StatsSection from "@/components/home/stats-section";
 import RewardsSection from "@/components/rewards-section";
 import ContactSection from "@/components/contact-section";
 import { Helmet } from "react-helmet";
@@ -50,6 +51,9 @@ const Landing: React.FC<{
         
         {/* How It Works Section */}
         <HowItWorksSection />
+        
+        {/* Stats Section */}
+        <StatsSection />
         
         {/* CTA Section */}
         <section className="py-20 bg-primary/5">

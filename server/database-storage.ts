@@ -310,6 +310,30 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(reports.updatedAt))
       .limit(5);
   }
+
+  // Public stats
+  async getTotalUserCount(): Promise<number> {
+    const result = await db
+      .select({ value: count() })
+      .from(users)
+      .where(eq(users.role, "user"));
+    return result[0]?.value ?? 0;
+  }
+
+  async getTotalReportCount(): Promise<number> {
+    const result = await db
+      .select({ value: count() })
+      .from(reports);
+    return result[0]?.value ?? 0;
+  }
+
+  async getResolvedReportCount(): Promise<number> {
+    const result = await db
+      .select({ value: count() })
+      .from(reports)
+      .where(eq(reports.status, "completed"));
+    return result[0]?.value ?? 0;
+  }
 }
 
 // Initialize admin secret codes in the database
