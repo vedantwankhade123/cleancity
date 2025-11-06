@@ -50,16 +50,16 @@ const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="bg-gray-900 text-white py-12">
+    <section id="contact" className="bg-gray-50 py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Left Column: Info */}
           <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold mb-4">Get In Touch</h2>
-            <p className="text-gray-400 mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get In Touch</h2>
+            <p className="text-gray-600 mb-6">
               Have questions or feedback? We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.
             </p>
-            <div className="space-y-3 text-gray-400 flex flex-col items-center md:items-start">
+            <div className="space-y-3 text-gray-600 flex flex-col items-center md:items-start">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary" />
                 <span>vedantwankhade47@gmail.com</span>
@@ -85,9 +85,9 @@ const ContactSection: React.FC = () => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Full name</FormLabel>
+                        <FormLabel>Full name</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="John Doe" className="bg-gray-800 border-gray-700 text-white focus:ring-primary" />
+                          <Input {...field} placeholder="John Doe" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -98,9 +98,9 @@ const ContactSection: React.FC = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-300">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" {...field} placeholder="you@example.com" className="bg-gray-800 border-gray-700 text-white focus:ring-primary" />
+                          <Input type="email" {...field} placeholder="you@example.com" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -112,10 +112,10 @@ const ContactSection: React.FC = () => {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-300">Message</FormLabel>
+                      <FormLabel>Message</FormLabel>
                       <FormControl>
                         <Textarea
-                          className="bg-gray-800 border-gray-700 text-white resize-none focus:ring-primary"
+                          className="resize-none"
                           rows={4}
                           {...field}
                           placeholder="Enter your message here..."
