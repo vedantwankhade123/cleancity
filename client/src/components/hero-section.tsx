@@ -100,7 +100,7 @@ const HeroSection: React.FC = () => {
             </motion.div>
 
             <motion.div
-              className="mt-16 flex flex-col sm:flex-row items-start sm:items-center gap-6 text-gray-700"
+              className="mt-16 flex flex-row flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 sm:gap-x-6 text-gray-700"
               variants={itemVariants}
             >
               <div className="flex items-center gap-3">
