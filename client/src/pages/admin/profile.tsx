@@ -10,6 +10,7 @@ import Sidebar from "@/components/layout/sidebar";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,9 +28,9 @@ import {
 } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, User, AlertTriangle, Check, Shield, Loader2 } from "lucide-react";
+import { Save, User, AlertTriangle, Check, Shield, Loader2, Lock } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { cn } from "@/lib/utils";
 
 // Form validation schema
 const profileFormSchema = z.object({
@@ -123,7 +124,6 @@ const AdminProfile: React.FC = () => {
   const passwordUpdateMutation = useMutation({
     mutationFn: async (data: PasswordFormValues) => {
       if (!user) throw new Error("User not authenticated");
-      // In a real app, this would call a password change API endpoint
       const response = await apiRequest("PATCH", `/api/users/${user.id}/password`, {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
@@ -156,6 +156,11 @@ const AdminProfile: React.FC = () => {
     passwordUpdateMutation.mutate(values);
   };
 
+  const navLinks = [
+    { id: 'profile', label: 'Profile', icon: Shield },
+    { id: 'password', label: 'Password', icon: Lock },
+  ];
+
   return (
     <>
       <Helmet>
@@ -167,196 +172,97 @@ const AdminProfile: React.FC = () => {
         <Sidebar />
         
         <div className="flex-1 md:ml-[calc(16rem+10px)]">
-          {/* Header */}
           <header className="bg-white shadow-sm sticky top-0 z-40">
             <div className="container px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16 items-center">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-                </div>
+                <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
               </div>
             </div>
           </header>
 
-          {/* Main Content */}
           <main className="container px-4 sm:px-6 lg:px-8 py-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Admin Account Settings</h2>
-                <p className="text-gray-600">Manage your profile and security preferences</p>
-              </div>
-              
-              <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6">
-                  <TabsTrigger value="profile">Profile</TabsTrigger>
-                  <TabsTrigger value="password">Password</TabsTrigger>
-                  <TabsTrigger value="account" disabled>
-                    Account
-                  </TabsTrigger>
-                </TabsList>
-                
-                {/* Profile Tab */}
-                <TabsContent value="profile">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Admin Profile Information</CardTitle>
-                      <CardDescription>
-                        Update your personal information and address
-                      </CardDescription>
-                    </CardHeader>
-                    
-                    <Form {...profileForm}>
-                      <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-                        <CardContent className="space-y-6">
-                          <div className="flex justify-center mb-6">
-                            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                              <Shield className="h-12 w-12" />
-                            </div>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-900">Admin Account Settings</h2>
+              <p className="text-gray-600 mt-1">Manage your admin profile and security preferences.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <aside className="lg:col-span-1">
+                <nav className="space-y-2">
+                  {navLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => setActiveTab(link.id)}
+                      className={cn(
+                        "w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                        activeTab === link.id
+                          ? "bg-primary/10 text-primary"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      )}
+                    >
+                      <link.icon className="mr-3 h-5 w-5" />
+                      <span>{link.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </aside>
+
+              <div className="lg:col-span-3">
+                {activeTab === 'profile' && (
+                  <Form {...profileForm}>
+                    <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-8">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Admin Profile</CardTitle>
+                          <CardDescription>This is your administrator profile.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex items-center gap-6">
+                          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <Shield className="h-10 w-10" />
                           </div>
-                          
-                          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-                            <div className="flex items-start">
-                              <div className="flex-shrink-0">
-                                <Shield className="h-5 w-5 text-blue-400" />
-                              </div>
-                              <div className="ml-3">
-                                <h3 className="text-sm font-medium text-blue-800">Admin Account</h3>
-                                <div className="mt-2 text-sm text-blue-700">
-                                  <p>
-                                    You are an administrator for {user?.city}. You have access to manage waste reports and users for this city.
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <FormField
-                            control={profileForm.control}
-                            name="fullName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField
-                              control={profileForm.control}
-                              name="phone"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Phone Number</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <div className="flex items-end">
-                              <p className="text-gray-500 text-sm">{user?.email}</p>
-                            </div>
-                          </div>
-                          
-                          <FormField
-                            control={profileForm.control}
-                            name="address"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Address</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <FormField
-                              control={profileForm.control}
-                              name="city"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>City</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} readOnly className="bg-gray-50" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={profileForm.control}
-                              name="state"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>State</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={profileForm.control}
-                              name="pincode"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Pincode</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                          <div className="flex-grow">
+                            <FormField control={profileForm.control} name="fullName" render={({ field }) => (<FormItem><FormLabel>Full Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
                           </div>
                         </CardContent>
-                        
-                        <CardFooter className="flex justify-end gap-2">
-                          <Button
-                            type="submit"
-                            disabled={!profileForm.formState.isDirty || profileUpdateMutation.isPending}
-                            className="gap-2"
-                          >
-                            {profileUpdateMutation.isPending ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Saving...
-                              </>
-                            ) : (
-                              <>
-                                <Save className="h-4 w-4" />
-                                Save Changes
-                              </>
-                            )}
+                      </Card>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Contact & Location</CardTitle>
+                          <CardDescription>Manage your contact details and assigned location.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl><Input value={user?.email || ''} disabled /></FormControl>
+                              <FormDescription>Your email address cannot be changed.</FormDescription>
+                            </FormItem>
+                            <FormField control={profileForm.control} name="phone" render={({ field }) => (<FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                          <FormField control={profileForm.control} name="address" render={({ field }) => (<FormItem><FormLabel>Address</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <FormField control={profileForm.control} name="city" render={({ field }) => (<FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} readOnly className="bg-gray-100" /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={profileForm.control} name="state" render={({ field }) => (<FormItem><FormLabel>State</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={profileForm.control} name="pincode" render={({ field }) => (<FormItem><FormLabel>Pincode</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-end">
+                          <Button type="submit" disabled={!profileForm.formState.isDirty || profileUpdateMutation.isPending} className="gap-2">
+                            {profileUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Saving...</>) : (<><Save className="h-4 w-4" />Save Changes</>)}
                           </Button>
                         </CardFooter>
-                      </form>
-                    </Form>
-                  </Card>
-                </TabsContent>
-                
-                {/* Password Tab */}
-                <TabsContent value="password">
+                      </Card>
+                    </form>
+                  </Form>
+                )}
+
+                {activeTab === 'password' && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Change Password</CardTitle>
-                      <CardDescription>
-                        Update your password to keep your account secure
-                      </CardDescription>
+                      <CardDescription>Update your password to keep your account secure.</CardDescription>
                     </CardHeader>
-                    
                     <Form {...passwordForm}>
                       <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
                         <CardContent className="space-y-6">
@@ -364,80 +270,23 @@ const AdminProfile: React.FC = () => {
                             <AlertTriangle className="h-4 w-4 text-yellow-600" />
                             <AlertTitle className="text-yellow-800">Important</AlertTitle>
                             <AlertDescription className="text-yellow-700">
-                              Make sure your new password is at least 6 characters
-                              and includes a mix of letters, numbers, and symbols.
-                              As an admin, your account security is critical.
+                              As an admin, your account security is critical. Use a strong, unique password.
                             </AlertDescription>
                           </Alert>
-                          
-                          <FormField
-                            control={passwordForm.control}
-                            name="currentPassword"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Current Password</FormLabel>
-                                <FormControl>
-                                  <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={passwordForm.control}
-                            name="newPassword"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>New Password</FormLabel>
-                                <FormControl>
-                                  <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <FormField
-                            control={passwordForm.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Confirm New Password</FormLabel>
-                                <FormControl>
-                                  <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => (<FormItem><FormLabel>Current Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={passwordForm.control} name="newPassword" render={({ field }) => (<FormItem><FormLabel>New Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Confirm New Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
                         </CardContent>
-                        
                         <CardFooter className="flex justify-end">
-                          <Button
-                            type="submit"
-                            variant="default"
-                            disabled={passwordUpdateMutation.isPending}
-                            className="gap-2"
-                          >
-                            {passwordUpdateMutation.isPending ? (
-                              <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Updating...
-                              </>
-                            ) : (
-                              <>
-                                <Check className="h-4 w-4" />
-                                Update Password
-                              </>
-                            )}
+                          <Button type="submit" variant="default" disabled={passwordUpdateMutation.isPending} className="gap-2">
+                            {passwordUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Updating...</>) : (<><Check className="h-4 w-4" />Update Password</>)}
                           </Button>
                         </CardFooter>
                       </form>
                     </Form>
                   </Card>
-                </TabsContent>
-              </Tabs>
+                )}
+              </div>
             </div>
           </main>
         </div>
