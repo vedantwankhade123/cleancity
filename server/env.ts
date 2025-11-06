@@ -10,6 +10,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
   // Optional in this app; sessions use SESSION_SECRET with a default elsewhere
   JWT_SECRET: z.string().min(32).optional(),
+  // Optional: comma-separated list of allowed front-end origins for CORS (e.g., https://your-site.netlify.app)
+  FRONTEND_ORIGIN: z.string().optional(),
   // Open-Meteo API is used which doesn't require an API key
 });
 

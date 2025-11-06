@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import './env'; // Load environment variables
@@ -7,6 +8,17 @@ import './env'; // Load environment variables
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+// Enable CORS for deployed frontend if configured
+if (process.env.FRONTEND_ORIGIN) {
+  const origins = process.env.FRONTEND_ORIGIN.split(",").map((s) => s.trim());
+  app.use(
+    cors({
+      origin: origins,
+      credentials: true,
+    })
+  );
+}
 
 app.use((req, res, next) => {
   const start = Date.now();

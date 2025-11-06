@@ -33,8 +33,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       cookie: { 
         maxAge: 86400000, // 24 hours
         httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production' // Set to true in production with HTTPS
+        // Use 'none' for cross-site cookies when deployed (Netlify + external API)
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production' // must be true with SameSite=None
       },
       store: new MemoryStoreSession({
         checkPeriod: 86400000 // prune expired entries every 24h
