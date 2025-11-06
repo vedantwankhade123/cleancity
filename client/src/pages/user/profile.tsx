@@ -189,91 +189,79 @@ const UserProfile: React.FC = () => {
             {/* Right Content Area */}
             <div className="lg:col-span-3">
               {activeTab === 'profile' && (
-                <Form {...profileForm}>
-                  <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-8">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Public Profile</CardTitle>
-                        <CardDescription>This information may be displayed publicly.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex items-center gap-6">
-                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                          <User className="h-10 w-10" />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profile</CardTitle>
+                    <CardDescription>Update your personal information.</CardDescription>
+                  </CardHeader>
+                  <Form {...profileForm}>
+                    <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                      <CardContent className="space-y-8">
+                        {/* Full Name */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Full Name</h3>
+                            <p className="text-sm text-gray-500">Your public display name.</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <FormField control={profileForm.control} name="fullName" render={({ field }) => (<FormItem><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
                         </div>
-                        <div className="flex-grow">
-                          <FormField
-                            control={profileForm.control}
-                            name="fullName"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Contact Information</CardTitle>
-                        <CardDescription>Manage your contact details.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl><Input value={user?.email || ''} disabled /></FormControl>
-                            <FormDescription>Your email address cannot be changed.</FormDescription>
-                          </FormItem>
-                          <FormField
-                            control={profileForm.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
-                                <FormControl><Input {...field} /></FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
+                        <hr />
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Address</CardTitle>
-                        <CardDescription>Your primary address for location-based services.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <FormField
-                          control={profileForm.control}
-                          name="address"
-                          render={({ field }) => (
+                        {/* Email */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Email</h3>
+                            <p className="text-sm text-gray-500">Your email address cannot be changed.</p>
+                          </div>
+                          <div className="md:col-span-2">
                             <FormItem>
-                              <FormLabel>Address</FormLabel>
-                              <FormControl><Input {...field} /></FormControl>
-                              <FormMessage />
+                              <FormControl><Input value={user?.email || ''} disabled /></FormControl>
                             </FormItem>
-                          )}
-                        />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                          <FormField control={profileForm.control} name="city" render={({ field }) => (<FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                          <FormField control={profileForm.control} name="state" render={({ field }) => (<FormItem><FormLabel>State</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                          <FormField control={profileForm.control} name="pincode" render={({ field }) => (<FormItem><FormLabel>Pincode</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        {/* Phone */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Phone Number</h3>
+                            <p className="text-sm text-gray-500">Your primary contact number.</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <FormField control={profileForm.control} name="phone" render={({ field }) => (<FormItem><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        {/* Address */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Address</h3>
+                            <p className="text-sm text-gray-500">Your primary address.</p>
+                          </div>
+                          <div className="md:col-span-2 space-y-4">
+                            <FormField control={profileForm.control} name="address" render={({ field }) => (<FormItem><FormControl><Input placeholder="Street Address" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                              <FormField control={profileForm.control} name="city" render={({ field }) => (<FormItem><FormControl><Input placeholder="City" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                              <FormField control={profileForm.control} name="state" render={({ field }) => (<FormItem><FormControl><Input placeholder="State" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                              <FormField control={profileForm.control} name="pincode" render={({ field }) => (<FormItem><FormControl><Input placeholder="Pincode" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            </div>
+                          </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-end">
+                      <CardFooter className="flex justify-end border-t pt-6">
                         <Button type="submit" disabled={!profileForm.formState.isDirty || profileUpdateMutation.isPending} className="gap-2">
                           {profileUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Saving...</>) : (<><Save className="h-4 w-4" />Save Changes</>)}
                         </Button>
                       </CardFooter>
-                    </Card>
-                  </form>
-                </Form>
+                    </form>
+                  </Form>
+                </Card>
               )}
               
               {activeTab === 'password' && (
@@ -284,19 +272,42 @@ const UserProfile: React.FC = () => {
                   </CardHeader>
                   <Form {...passwordForm}>
                     <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-                      <CardContent className="space-y-6">
-                        <Alert className="bg-yellow-50 border-yellow-200">
-                          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                          <AlertTitle className="text-yellow-800">Important</AlertTitle>
-                          <AlertDescription className="text-yellow-700">
-                            Make sure your new password is at least 6 characters and includes a mix of letters, numbers, and symbols.
-                          </AlertDescription>
-                        </Alert>
-                        <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => (<FormItem><FormLabel>Current Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={passwordForm.control} name="newPassword" render={({ field }) => (<FormItem><FormLabel>New Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Confirm New Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                      <CardContent className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Current Password</h3>
+                            <p className="text-sm text-gray-500">Enter your current password.</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <FormField control={passwordForm.control} name="currentPassword" render={({ field }) => (<FormItem><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">New Password</h3>
+                            <p className="text-sm text-gray-500">Enter your new password.</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <FormField control={passwordForm.control} name="newPassword" render={({ field }) => (<FormItem><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </div>
+
+                        <hr />
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="md:col-span-1">
+                            <h3 className="font-medium">Confirm New Password</h3>
+                            <p className="text-sm text-gray-500">Re-enter your new password.</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <FormField control={passwordForm.control} name="confirmPassword" render={({ field }) => (<FormItem><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </div>
                       </CardContent>
-                      <CardFooter className="flex justify-end">
+                      <CardFooter className="flex justify-end border-t pt-6">
                         <Button type="submit" variant="default" disabled={passwordUpdateMutation.isPending} className="gap-2">
                           {passwordUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Updating...</>) : (<><Check className="h-4 w-4" />Update Password</>)}
                         </Button>
