@@ -14,8 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { User, Mail, MessageSquare, Send, Phone, MapPin } from "lucide-react";
+import { Send } from "lucide-react";
 
 // Form validation schema
 const contactFormSchema = z.object({
@@ -51,140 +50,73 @@ const ContactSection: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-50">
+    <section id="contact" className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Get In Touch</h2>
-          <p className="text-lg text-gray-600">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Get In Touch</h2>
+          <p className="text-gray-400 mb-8">
             Have questions or feedback? We'd love to hear from you.
           </p>
-        </div>
-        
-        <Card className="overflow-hidden shadow-lg border-gray-200">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Left Side: Form */}
-            <div className="p-8">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Send us a Message</h3>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full name</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <Input {...field} placeholder="John Doe" className="pl-10" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <Input type="email" {...field} placeholder="you@example.com" className="pl-10" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Textarea
-                              className="pl-10 resize-none"
-                              rows={5}
-                              {...field}
-                              placeholder="Enter your message here..."
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="submit"
-                    className="w-full gap-2"
-                    disabled={form.formState.isSubmitting}
-                  >
-                    {form.formState.isSubmitting ? (
-                      <>
-                        <Send className="h-4 w-4 animate-pulse" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        Send Message
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </Form>
-            </div>
-            
-            {/* Right Side: Contact Info */}
-            <div className="bg-primary/5 p-8 flex flex-col justify-center">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Contact Information</h3>
-              <p className="text-gray-600 mb-8">
-                You can also reach us directly through the following channels. We're available during standard business hours.
-              </p>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                    <Mail className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">Email</h4>
-                    <a href="mailto:vedantwankhade47@gmail.com" className="text-primary hover:underline">
-                      vedantwankhade47@gmail.com
-                    </a>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                    <Phone className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">Phone</h4>
-                    <a href="tel:+919175988560" className="text-primary hover:underline">
-                      +91 9175988560
-                    </a>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                    <MapPin className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800">Address</h4>
-                    <p className="text-gray-600">Amravati, Maharashtra, India</p>
-                  </div>
-                </div>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Full name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="John Doe" className="bg-gray-800 border-gray-700 text-white focus:ring-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} placeholder="you@example.com" className="bg-gray-800 border-gray-700 text-white focus:ring-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </div>
-          </div>
-        </Card>
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="bg-gray-800 border-gray-700 text-white resize-none focus:ring-primary"
+                        rows={4}
+                        {...field}
+                        placeholder="Enter your message here..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className="w-full gap-2 bg-primary hover:bg-primary/90"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Sending..." : "Send Message"}
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     </section>
   );
