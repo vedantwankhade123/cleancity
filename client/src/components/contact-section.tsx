@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Send, Mail, Phone, MapPin } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 // Form validation schema
 const contactFormSchema = z.object({
@@ -36,34 +37,78 @@ const ContactSection: React.FC = () => {
   });
 
   const onSubmit = (values: ContactFormValues) => {
-    // In a real application, you would send this to your backend
     console.log(values);
-    
-    // Show success message
     toast({
       title: "Message Sent!",
       description: "Thank you for reaching out. We'll get back to you shortly.",
     });
-    
-    // Reset form
     form.reset();
   };
 
+  const contactInfo = [
+    {
+      icon: Mail,
+      title: "Email Us",
+      value: "vedantwankhade47@gmail.com",
+      href: "mailto:vedantwankhade47@gmail.com",
+    },
+    {
+      icon: Phone,
+      title: "Call Us",
+      value: "+91 9175988560",
+      href: "tel:+919175988560",
+    },
+    {
+      icon: MapPin,
+      title: "Visit Us",
+      value: "Amravati, Maharashtra, India",
+    },
+  ];
+
   return (
-    <section id="contact" className="bg-white py-20 sm:py-24">
+    <section id="contact" className="bg-gray-50 py-20 sm:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Get In Touch</h2>
-          <p className="text-lg text-gray-600">
-            Have questions or feedback? We'd love to hear from you.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left Column: Form */}
-          <div className="bg-gray-50 p-8 rounded-lg border">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left Column: Info */}
+          <div className="space-y-8">
+            <div className="max-w-md">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Let's Connect
+              </h2>
+              <p className="mt-4 text-lg text-gray-600">
+                We're here to help and answer any question you might have. We look forward to hearing from you.
+              </p>
+            </div>
+            <div className="space-y-6">
+              {contactInfo.map((item, index) => (
+                <div key={index} className="flex items-start gap-5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                    {item.href ? (
+                      <a href={item.href} className="text-gray-600 hover:text-primary transition-colors">
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p className="text-gray-600">{item.value}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column: Form */}
+          <Card className="w-full shadow-lg border-gray-200">
+            <CardHeader>
+              <CardTitle>Send us a message</CardTitle>
+              <CardDescription>Fill out the form below and we'll get back to you as soon as possible.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
                     name="name"
@@ -90,63 +135,36 @@ const ContactSection: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Message</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          className="resize-none"
-                          rows={5}
-                          {...field}
-                          placeholder="Enter your message here..."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full gap-2 bg-primary hover:bg-primary/90"
-                  disabled={form.formState.isSubmitting}
-                >
-                  {form.formState.isSubmitting ? "Sending..." : "Send Message"}
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
-            </Form>
-          </div>
-          {/* Right Column: Info */}
-          <div className="space-y-6 pt-4">
-            <h3 className="text-xl font-semibold text-gray-800">Contact Information</h3>
-            <p className="text-gray-600">
-              You can also reach us directly through the following channels. We're available during standard business hours.
-            </p>
-            <div className="space-y-4 text-gray-700">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-primary" />
-                </div>
-                <a href="mailto:vedantwankhade47@gmail.com" className="hover:underline">vedantwankhade47@gmail.com</a>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-primary" />
-                </div>
-                <span>+91 9175988560</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-primary" />
-                </div>
-                <span>Amravati, Maharashtra, India</span>
-              </div>
-            </div>
-          </div>
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Message</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            className="resize-none"
+                            rows={5}
+                            {...field}
+                            placeholder="Enter your message here..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full gap-2 bg-primary hover:bg-primary/90 py-6 text-base"
+                    disabled={form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting ? "Sending..." : "Send Message"}
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
