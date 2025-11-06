@@ -235,48 +235,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const onLoginSubmit = async (values: LoginFormValues) => {
     setError(null)
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-          role: userType,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Check if it's a request status response (403 for pending/rejected admin requests)
-        if (data.requestStatus) {
-          setError(data.message || 'Admin request status check');
-          return;
-        }
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Check if response contains request status (shouldn't happen with 200, but just in case)
-      if (data.requestStatus) {
-        setError(data.message || 'Admin request status check');
-        return;
-      }
-
-      // Normal login success - session is already set by the server, just redirect
+      await login({
+        email: values.email,
+        password: values.password,
+        role: userType,
+      })
+      // On success, the useAuth hook handles redirection. We just close the modal.
       handleClose()
-      
-      // Redirect to appropriate dashboard
-      if (data.role === "admin") {
-        window.location.href = "/admin/dashboard";
-      } else {
-        window.location.href = "/user/dashboard";
-      }
     } catch (err: any) {
       let errorMessage = 'Failed to login.';
       try {
+        // The error from useMutation is an Error object, its message might be a JSON string
         const errorJson = JSON.parse(err.message);
         errorMessage = errorJson.message || errorMessage;
       } catch (e) {
