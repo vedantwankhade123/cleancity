@@ -15,6 +15,7 @@ import {
   UserCheck,
   Shield,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -75,6 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     { href: "/user/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/user/reports", label: "My Reports", icon: Flag },
     { href: "/user/rewards", label: "Rewards", icon: BarChart3 },
+    { href: "/user/learn", label: "Learn", icon: BookOpen },
   ];
 
   const navLinks = isAdmin ? adminNavLinks : userNavLinks;

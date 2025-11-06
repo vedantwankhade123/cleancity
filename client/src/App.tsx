@@ -12,6 +12,7 @@ const UserReportForm = lazy(() => import("@/pages/user/report-form"));
 const UserReports = lazy(() => import("@/pages/user/reports"));
 const UserRewards = lazy(() => import("@/pages/user/rewards"));
 const UserProfile = lazy(() => import("@/pages/user/profile"));
+const UserLearn = lazy(() => import("@/pages/user/learn"));
 
 const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
 const AdminReports = lazy(() => import("@/pages/admin/reports"));
@@ -130,6 +131,9 @@ function Router() {
         </Route>
         <Route path="/user/profile">
           <ProtectedRoute component={UserProfile} requiredRole="user" />
+        </Route>
+        <Route path="/user/learn">
+          <ProtectedRoute component={UserLearn} requiredRole="user" />
         </Route>
 
         {/* Admin routes */}
