@@ -108,31 +108,35 @@ const UserDashboard: React.FC = () => {
 
           {/* Dashboard Tabs */}
           <Tabs defaultValue="reports" value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
               <TabsList>
                 <TabsTrigger value="reports">My Reports</TabsTrigger>
                 <TabsTrigger value="rewards">Rewards</TabsTrigger>
               </TabsList>
               
-              <Link href="/user/report-new">
-                <Button className="gap-2">
-                  <PlusCircle className="h-4 w-4" />
-                  New Report
-                </Button>
-              </Link>
+              <div className="flex w-full sm:w-auto items-center gap-4">
+                {activeTab === "reports" && (
+                  <div className="relative flex-1 sm:w-auto">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      placeholder="Search your reports..."
+                      className="pl-9"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                )}
+                
+                <Link href="/user/report-new">
+                  <Button className="gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    New Report
+                  </Button>
+                </Link>
+              </div>
             </div>
             
             <TabsContent value="reports" className="space-y-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <Input
-                  placeholder="Search your reports by title, description, or address..."
-                  className="pl-9"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
