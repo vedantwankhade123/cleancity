@@ -14,7 +14,7 @@ const AboutSection: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Feature 1 */}
-          <div className="text-center p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="text-center p-6">
             <div className="feature-icon bg-primary/10">
               <MapPin className="text-2xl text-primary" />
             </div>
@@ -25,7 +25,7 @@ const AboutSection: React.FC = () => {
           </div>
           
           {/* Feature 2 */}
-          <div className="text-center p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="text-center p-6">
             <div className="feature-icon bg-secondary/10">
               <Recycle className="text-2xl text-secondary" />
             </div>
@@ -36,7 +36,7 @@ const AboutSection: React.FC = () => {
           </div>
           
           {/* Feature 3 */}
-          <div className="text-center p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="text-center p-6">
             <div className="feature-icon bg-accent/10">
               <Gift className="text-2xl text-accent" />
             </div>

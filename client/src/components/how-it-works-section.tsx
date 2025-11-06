@@ -72,17 +72,8 @@ const HowItWorksSection: React.FC = () => {
                 className="text-center p-6 rounded-xl cursor-pointer w-64 flex-shrink-0 relative z-10 bg-gray-50"
                 animate={activeIndex === index ? "active" : "inactive"}
                 variants={{
-                  active: {
-                    scale: 1.05,
-                    borderColor: "hsl(var(--primary))",
-                    backgroundColor: "hsl(var(--background))",
-                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-                  },
-                  inactive: {
-                    scale: 1,
-                    borderColor: "transparent",
-                    boxShadow: "0 0 #0000",
-                  },
+                  active: { scale: 1.05 },
+                  inactive: { scale: 1 },
                 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
@@ -126,21 +117,11 @@ const HowItWorksSection: React.FC = () => {
             <motion.div
               key={index}
               onClick={() => handleStepClick(index)}
-              className="text-center p-6 rounded-xl cursor-pointer border-2"
+              className="text-center p-6 rounded-xl cursor-pointer"
               animate={activeIndex === index ? "active" : "inactive"}
               variants={{
-                active: {
-                  scale: 1.05,
-                  borderColor: "hsl(var(--primary))",
-                  backgroundColor: "hsl(var(--background))",
-                  boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-                },
-                inactive: {
-                  scale: 1,
-                  borderColor: "transparent",
-                  backgroundColor: "transparent",
-                  boxShadow: "0 0 #0000",
-                },
+                active: { scale: 1.05 },
+                inactive: { scale: 1 },
               }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >

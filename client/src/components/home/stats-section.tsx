@@ -78,7 +78,7 @@ const StatsSection: React.FC = () => {
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center"
+              className="text-center p-8"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
