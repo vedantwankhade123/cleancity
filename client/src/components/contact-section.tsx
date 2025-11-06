@@ -14,13 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, User, Mail, FileText, MessageSquare } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { User, Mail, MessageSquare, Send, Phone, MapPin } from "lucide-react";
 
 // Form validation schema
 const contactFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   email: z.string().email("Invalid email address"),
-  subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
@@ -32,7 +32,6 @@ const ContactSection: React.FC = () => {
     defaultValues: {
       name: "",
       email: "",
-      subject: "",
       message: "",
     },
   });
@@ -43,8 +42,8 @@ const ContactSection: React.FC = () => {
     
     // Show success message
     toast({
-      title: "Message Sent",
-      description: "Thank you for contacting us. We'll get back to you soon!",
+      title: "Message Sent!",
+      description: "Thank you for reaching out. We'll get back to you shortly.",
     });
     
     // Reset form
@@ -54,80 +53,47 @@ const ContactSection: React.FC = () => {
   return (
     <section id="contact" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-900 text-gray-300 rounded-2xl p-8 md:p-12 lg:p-16 relative overflow-hidden">
-          {/* Green gradient overlay */}
-          <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-[1500px] h-[1500px] bg-[radial-gradient(circle,rgba(34,197,94,0.15)_0%,rgba(34,197,94,0)_60%)]"></div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-            {/* Left Column: Info */}
-            <div className="space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-bold text-white">Get In Touch</h2>
-              <p className="text-lg text-gray-400">
-                Have a question, feedback, or a partnership proposal? We'd love to hear from you. Our team is ready to answer all your questions.
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                  <span>We respond to all inquiries within 24 hours.</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                  <span>Your feedback helps us improve our services.</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                  <span>Connect directly with our dedicated support team.</span>
-                </li>
-              </ul>
-              <div className="pt-8 border-t border-gray-700/50">
-                <p className="text-gray-400 mb-2">Or reach us directly:</p>
-                <a href="mailto:vedantwankhade47@gmail.com" className="text-lg font-medium text-white hover:text-primary transition-colors">
-                  vedantwankhade47@gmail.com
-                </a>
-              </div>
-            </div>
-            
-            {/* Right Column: Form */}
-            <div>
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Get In Touch</h2>
+          <p className="text-lg text-gray-600">
+            Have questions or feedback? We'd love to hear from you.
+          </p>
+        </div>
+        
+        <Card className="overflow-hidden shadow-lg border-gray-200">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            {/* Left Side: Form */}
+            <div className="p-8">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Send us a Message</h3>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Full name*</FormLabel>
+                          <FormLabel>Full name</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                              <Input 
-                                {...field} 
-                                placeholder="e.g. John Doe"
-                                className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
-                              />
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input {...field} placeholder="John Doe" className="pl-10" />
                             </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
                     <FormField
                       control={form.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-400">Email*</FormLabel>
+                          <FormLabel>Email</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                              <Input 
-                                type="email" 
-                                {...field} 
-                                placeholder="e.g. john.doe@example.com"
-                                className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
-                              />
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input type="email" {...field} placeholder="you@example.com" className="pl-10" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -135,41 +101,19 @@ const ContactSection: React.FC = () => {
                       )}
                     />
                   </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="subject"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-400">Subject*</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                            <Input 
-                              {...field} 
-                              placeholder="e.g. Partnership Inquiry"
-                              className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 focus:border-primary focus:ring-primary placeholder:text-gray-500"
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
                   <FormField
                     control={form.control}
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-400">Message*</FormLabel>
+                        <FormLabel>Message</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <MessageSquare className="absolute left-3 top-4 h-4 w-4 text-gray-500" />
-                            <Textarea 
-                              className="bg-gray-800/50 border-gray-700 rounded-lg pl-10 pt-3 focus:border-primary focus:ring-primary placeholder:text-gray-500 resize-none" 
-                              rows={4} 
-                              {...field} 
+                            <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Textarea
+                              className="pl-10 resize-none"
+                              rows={5}
+                              {...field}
                               placeholder="Enter your message here..."
                             />
                           </div>
@@ -178,19 +122,69 @@ const ContactSection: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full py-3 px-4 bg-primary text-white font-semibold rounded-full hover:bg-primary/90 transition-colors text-lg h-auto"
+                  <Button
+                    type="submit"
+                    className="w-full gap-2"
                     disabled={form.formState.isSubmitting}
                   >
-                    {form.formState.isSubmitting ? "Sending..." : "Submit Inquiry"}
+                    {form.formState.isSubmitting ? (
+                      <>
+                        <Send className="h-4 w-4 animate-pulse" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               </Form>
             </div>
+            
+            {/* Right Side: Contact Info */}
+            <div className="bg-primary/5 p-8 flex flex-col justify-center">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Contact Information</h3>
+              <p className="text-gray-600 mb-8">
+                You can also reach us directly through the following channels. We're available during standard business hours.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Mail className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Email</h4>
+                    <a href="mailto:vedantwankhade47@gmail.com" className="text-primary hover:underline">
+                      vedantwankhade47@gmail.com
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Phone className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Phone</h4>
+                    <a href="tel:+919175988560" className="text-primary hover:underline">
+                      +91 9175988560
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <MapPin className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Address</h4>
+                    <p className="text-gray-600">Amravati, Maharashtra, India</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </Card>
       </div>
     </section>
   );
