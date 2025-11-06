@@ -316,7 +316,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select({ value: count() })
       .from(users)
-      .where(and(eq(users.role, "user"), eq(users.isActive, true)));
+      .where(eq(users.role, "user"));
     return result[0]?.value ?? 0;
   }
 
