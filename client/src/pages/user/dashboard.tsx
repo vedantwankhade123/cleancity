@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Flag, Coins, CheckCircle, Loader2 } from "lucide-react";
+import { PlusCircle, Flag, Coins, CheckCircle, Loader2, Search } from "lucide-react";
 import { Report } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import StatsCard from "@/components/stats-card";
@@ -11,10 +11,12 @@ import ReportCard from "@/components/report-card";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
+import { Input } from "@/components/ui/input";
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("reports");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Fetch user reports
   const { 
@@ -27,11 +29,18 @@ const UserDashboard: React.FC = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
+  // Filter reports based on search query
+  const filteredReports = reports?.filter(report => {
+    return !searchQuery || 
+      report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.address.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   // Count reports by status
   const getTotalReports = () => reports?.length || 0;
   const getCompletedReports = () => reports?.filter(r => r.status === "completed").length || 0;
   const getInProgressReports = () => reports?.filter(r => r.status === "processing").length || 0;
-  const getPendingReports = () => reports?.filter(r => r.status === "pending").length || 0;
 
   // Calculate total reward points
   const getTotalRewardPoints = () => {
@@ -114,6 +123,16 @@ const UserDashboard: React.FC = () => {
             </div>
             
             <TabsContent value="reports" className="space-y-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Search your reports by title, description, or address..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -133,9 +152,16 @@ const UserDashboard: React.FC = () => {
                     <Button>Submit a Report</Button>
                   </Link>
                 </div>
+              ) : filteredReports && filteredReports.length === 0 ? (
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-medium">No matching reports</h3>
+                  <p className="text-gray-500 mt-2">
+                    Try a different search term.
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-4">
-                  {reports?.map((report) => (
+                  {filteredReports?.map((report) => (
                     <ReportCard key={report.id} report={report} />
                   ))}
                 </div>
