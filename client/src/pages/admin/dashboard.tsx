@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Bookmark,
   Calendar as CalendarIcon,
@@ -30,7 +30,6 @@ import { DateRange, DayContent, type DayContentProps } from "react-day-picker";
 import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { apiRequest } from "@/lib/queryClient";
-import InteractiveMap from "@/components/admin/interactive-map";
 
 interface Notification {
   id: string;
@@ -352,26 +351,138 @@ const AdminDashboard: React.FC = () => {
               />
             </div>
 
-            {/* Map and Activity Timeline */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-              <div className="lg:col-span-2">
-                <Card className="h-[500px]">
-                  <CardHeader>
-                    <CardTitle>Reports Map</CardTitle>
-                    <CardDescription>Live overview of reported issues in your city.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="h-[calc(500px-78px)] p-0">
-                    {isLoadingReports ? (
-                      <div className="flex justify-center items-center h-full">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      </div>
-                    ) : (
-                      <InteractiveMap reports={reports || []} />
-                    )}
-                  </CardContent>
-                </Card>
+            {/* Recent Reports */}
+            <div className="bg-white rounded-lg shadow mb-8">
+              <div className="flex items-center justify-between p-6 border-b">
+                <h3 className="text-xl font-bold">Recent Reports</h3>
+                <Link href="/admin/reports">
+                  <Button variant="link" className="text-primary hover:text-primary-dark font-medium">
+                    View All
+                  </Button>
+                </Link>
               </div>
-              
+              <div className="p-6">
+                {isLoading ? (
+                  <div className="flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : !filteredReports || filteredReports.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Flag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium">No reports in this period</h3>
+                    <p className="text-gray-500 mt-2">
+                      Try selecting a different date range to see reports.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Desktop Table */}
+                    <div className="overflow-x-auto hidden md:block">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {filteredReports.slice(0, 4).map((report) => (
+                            <tr key={report.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 overflow-hidden"><img src={report.imageUrl} alt={report.title} className="h-10 w-10 object-cover" /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{report.title}</div><div className="text-sm text-gray-500">Reported by: User #{report.userId}</div></div></div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{report.address.split(",")[0]}</div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{formatDate(report.createdAt)}</div><div className="text-sm text-gray-500">{new Date(report.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div></td>
+                              <td className="px-6 py-4 whitespace-nowrap"><ReportStatusBadge status={report.status} /></td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><Link href={`/admin/reports?id=${report.id}`}><Button variant="link" className="text-secondary hover:text-secondary-dark mr-3">View</Button></Link>{report.status === "pending" && (<Button variant="link" className="text-green-600 hover:text-green-800">Process</Button>)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Mobile Card List */}
+                    <div className="space-y-4 md:hidden">
+                      {filteredReports.slice(0, 4).map((report) => (
+                        <Card key={report.id} className="p-4">
+                          <div className="flex items-start gap-4">
+                            <img src={report.imageUrl} alt={report.title} className="h-16 w-16 object-cover rounded-md" />
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-semibold text-gray-900">{report.title}</h4>
+                                <ReportStatusBadge status={report.status} />
+                              </div>
+                              <p className="text-sm text-gray-500 mt-1">{report.address.split(",")[0]}</p>
+                              <p className="text-xs text-gray-500 mt-2">{formatDate(report.createdAt)}</p>
+                            </div>
+                          </div>
+                          <div className="mt-4 pt-4 border-t flex justify-end gap-2">
+                            <Link href={`/admin/reports?id=${report.id}`}><Button size="sm" variant="outline">View Details</Button></Link>
+                            {report.status === "pending" && (<Button size="sm">Process</Button>)}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* User Management and Activity Timeline */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              {/* User Management */}
+              <div className="lg:col-span-2 bg-white rounded-lg shadow">
+                <div className="flex items-center justify-between p-6 border-b">
+                  <h3 className="text-xl font-bold">User Management</h3>
+                  <Link href="/admin/users">
+                    <Button variant="link" className="text-primary hover:text-primary-dark font-medium">
+                      Manage Users
+                    </Button>
+                  </Link>
+                </div>
+                <div className="p-6">
+                  {isLoadingUsers ? (
+                    <div className="flex justify-center items-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : !users || users.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium">No users yet</h3>
+                      <p className="text-gray-500 mt-2">
+                        User registrations will appear here
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {users
+                        .filter(u => u.role === "user")
+                        .slice(0, 3)
+                        .map((user) => {
+                          const userReports = reports?.filter(r => r.userId === user.id) || [];
+                          const completedReports = userReports.filter(r => r.status === "completed").length;
+                          
+                          return (
+                            <div key={user.id} className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><User className="h-5 w-5" /></div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{user.fullName}</p>
+                                  <p className="text-sm text-gray-500">{user.email}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium">{userReports.length} reports</p>
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>{user.isActive ? "Active" : "Inactive"}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Activity Timeline */}
               <div className="bg-white rounded-lg shadow">
                 <div className="p-6 border-b">
@@ -427,138 +538,6 @@ const AdminDashboard: React.FC = () => {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Reports and User Management */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-              {/* Recent Reports */}
-              <div className="lg:col-span-2 bg-white rounded-lg shadow">
-                <div className="flex items-center justify-between p-6 border-b">
-                  <h3 className="text-xl font-bold">Recent Reports</h3>
-                  <Link href="/admin/reports">
-                    <Button variant="link" className="text-primary hover:text-primary-dark font-medium">
-                      View All
-                    </Button>
-                  </Link>
-                </div>
-                <div className="p-6">
-                  {isLoading ? (
-                    <div className="flex justify-center items-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : !filteredReports || filteredReports.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Flag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium">No reports in this period</h3>
-                      <p className="text-gray-500 mt-2">
-                        Try selecting a different date range to see reports.
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Desktop Table */}
-                      <div className="overflow-x-auto hidden md:block">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead>
-                            <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredReports.slice(0, 4).map((report) => (
-                              <tr key={report.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 overflow-hidden"><img src={report.imageUrl} alt={report.title} className="h-10 w-10 object-cover" /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{report.title}</div><div className="text-sm text-gray-500">Reported by: User #{report.userId}</div></div></div></td>
-                                <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{report.address.split(",")[0]}</div></td>
-                                <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{formatDate(report.createdAt)}</div><div className="text-sm text-gray-500">{new Date(report.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div></td>
-                                <td className="px-6 py-4 whitespace-nowrap"><ReportStatusBadge status={report.status} /></td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"><Link href={`/admin/reports?id=${report.id}`}><Button variant="link" className="text-secondary hover:text-secondary-dark mr-3">View</Button></Link>{report.status === "pending" && (<Button variant="link" className="text-green-600 hover:text-green-800">Process</Button>)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      {/* Mobile Card List */}
-                      <div className="space-y-4 md:hidden">
-                        {filteredReports.slice(0, 4).map((report) => (
-                          <Card key={report.id} className="p-4">
-                            <div className="flex items-start gap-4">
-                              <img src={report.imageUrl} alt={report.title} className="h-16 w-16 object-cover rounded-md" />
-                              <div className="flex-1">
-                                <div className="flex justify-between items-start">
-                                  <h4 className="font-semibold text-gray-900">{report.title}</h4>
-                                  <ReportStatusBadge status={report.status} />
-                                </div>
-                                <p className="text-sm text-gray-500 mt-1">{report.address.split(",")[0]}</p>
-                                <p className="text-xs text-gray-500 mt-2">{formatDate(report.createdAt)}</p>
-                              </div>
-                            </div>
-                            <div className="mt-4 pt-4 border-t flex justify-end gap-2">
-                              <Link href={`/admin/reports?id=${report.id}`}><Button size="sm" variant="outline">View Details</Button></Link>
-                              {report.status === "pending" && (<Button size="sm">Process</Button>)}
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* User Management */}
-              <div className="bg-white rounded-lg shadow">
-                <div className="flex items-center justify-between p-6 border-b">
-                  <h3 className="text-xl font-bold">User Management</h3>
-                  <Link href="/admin/users">
-                    <Button variant="link" className="text-primary hover:text-primary-dark font-medium">
-                      Manage Users
-                    </Button>
-                  </Link>
-                </div>
-                <div className="p-6">
-                  {isLoadingUsers ? (
-                    <div className="flex justify-center items-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : !users || users.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium">No users yet</h3>
-                      <p className="text-gray-500 mt-2">
-                        User registrations will appear here
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {users
-                        .filter(u => u.role === "user")
-                        .slice(0, 3)
-                        .map((user) => {
-                          const userReports = reports?.filter(r => r.userId === user.id) || [];
-                          
-                          return (
-                            <div key={user.id} className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600"><User className="h-5 w-5" /></div>
-                                <div>
-                                  <p className="font-medium text-gray-900">{user.fullName}</p>
-                                  <p className="text-sm text-gray-500">{user.email}</p>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm font-medium">{userReports.length} reports</p>
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>{user.isActive ? "Active" : "Inactive"}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
                     </div>
                   )}
                 </div>
