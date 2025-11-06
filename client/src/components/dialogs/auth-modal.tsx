@@ -873,8 +873,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     className='w-full gap-2'
                     disabled={isLoading}
                   >
-                    {isLoading && <Loader2 className='h-4 w-4 animate-spin' />}{' '}
-                    Login
+                    {isLoading ? (
+                      <>
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                        Logging in...
+                      </>
+                    ) : (
+                      'Login'
+                    )}
                   </Button>
                 </form>
               </Form>
@@ -930,13 +936,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         {!isCheckingAdmin && <ArrowRight className='h-4 w-4' />}
                       </Button>
                     ) : (
-                      <Button type='submit' disabled={isLoading || isCheckingAdmin}>
-                        {isLoading && (
-                          <Loader2 className='h-4 w-4 animate-spin mr-2' />
+                      <Button type='submit' disabled={isLoading || isCheckingAdmin} className="gap-2">
+                        {isLoading ? (
+                          <>
+                            <Loader2 className='h-4 w-4 animate-spin' />
+                            {userType === 'admin' && adminExists === true ? 'Submitting...' : 'Creating...'}
+                          </>
+                        ) : (
+                          userType === 'admin' 
+                            ? (adminExists === true ? 'Submit Request' : 'Create Account') 
+                            : 'Create Account'
                         )}
-                        {userType === 'admin' 
-                          ? (adminExists === true ? 'Submit Request' : 'Create Account') 
-                          : 'Create Account'}
                       </Button>
                     )}
                   </div>
