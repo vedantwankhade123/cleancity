@@ -314,14 +314,18 @@ const AdminDashboard: React.FC = () => {
                 title="Total Reports"
                 value={getTotalReports()}
                 icon={Flag}
+                description="All reports submitted in your city for the selected period."
+                linkTo="/admin/reports"
                 iconColor="text-primary"
                 iconBgColor="bg-primary/10"
               />
               
               <StatsCard
-                title="Pending"
+                title="Pending Review"
                 value={getReportsByStatus("pending")}
                 icon={Clock}
+                description="New reports that are awaiting your review and action."
+                linkTo="/admin/reports"
                 iconColor="text-gray-600"
                 iconBgColor="bg-gray-100"
               />
@@ -330,6 +334,8 @@ const AdminDashboard: React.FC = () => {
                 title="In Progress"
                 value={getReportsByStatus("processing")}
                 icon={Loader2}
+                description="Reports that are currently being processed and worked on."
+                linkTo="/admin/reports"
                 iconColor="text-orange-600"
                 iconBgColor="bg-orange-100"
               />
@@ -338,6 +344,8 @@ const AdminDashboard: React.FC = () => {
                 title="Completed"
                 value={getReportsByStatus("completed")}
                 icon={CheckCircle}
+                description="Issues that have been successfully resolved and closed."
+                linkTo="/admin/reports"
                 iconColor="text-green-600"
                 iconBgColor="bg-green-100"
               />

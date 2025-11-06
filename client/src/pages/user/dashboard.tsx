@@ -55,11 +55,13 @@ const UserDashboard: React.FC = () => {
           </div>
 
           {/* Dashboard Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatsCard
               title="Total Reports"
               value={getTotalReports()}
               icon={Flag}
+              description="All waste reports you have submitted."
+              linkTo="/user/reports"
               iconColor="text-primary"
               iconBgColor="bg-primary/10"
             />
@@ -68,6 +70,8 @@ const UserDashboard: React.FC = () => {
               title="Completed"
               value={getCompletedReports()}
               icon={CheckCircle}
+              description="Issues that have been successfully resolved."
+              linkTo="/user/reports"
               iconColor="text-green-600"
               iconBgColor="bg-green-100"
             />
@@ -76,6 +80,8 @@ const UserDashboard: React.FC = () => {
               title="In Progress"
               value={getInProgressReports()}
               icon={Loader2}
+              description="Reports currently being addressed by the authorities."
+              linkTo="/user/reports"
               iconColor="text-orange-600"
               iconBgColor="bg-orange-100"
             />
@@ -84,6 +90,8 @@ const UserDashboard: React.FC = () => {
               title="Reward Points"
               value={getTotalRewardPoints()}
               icon={Coins}
+              description="Points earned from your valuable contributions."
+              linkTo="/user/rewards"
               iconColor="text-accent"
               iconBgColor="bg-accent/10"
             />
