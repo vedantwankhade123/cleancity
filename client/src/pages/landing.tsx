@@ -12,7 +12,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Users, MapPin, Award } from "lucide-react";
-import FeaturesCarousel from "@/components/home/features-carousel";
 
 const Landing: React.FC<{ 
   setShowLoginModal: (show: boolean) => void;
@@ -45,9 +44,6 @@ const Landing: React.FC<{
       <main className="flex-grow">
         {/* Hero Section */}
         <HeroSection />
-        
-        {/* Features Carousel */}
-        <FeaturesCarousel />
         
         {/* About Section */}
         <AboutSection />

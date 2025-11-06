@@ -5,6 +5,7 @@ import AuthModal from "@/components/dialogs/auth-modal";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowRight, Flag, CheckCircle, Award } from "lucide-react";
+import FeaturesCarousel from "@/components/home/features-carousel";
 
 const HeroSection: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -54,7 +55,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section id="home" className="relative w-full bg-gradient-to-br from-gray-50 via-white to-green-50">
+    <section id="home" className="relative w-full bg-gradient-to-br from-gray-50 via-white to-green-50 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-5 gap-8 items-center min-h-screen pt-24 md:pt-0 pb-12">
           {/* Left Column: Text Content */}
@@ -133,6 +134,11 @@ const HeroSection: React.FC = () => {
             />
           </motion.div>
         </div>
+      </div>
+
+      {/* Features Carousel at the bottom */}
+      <div className="absolute bottom-0 left-0 right-0">
+        <FeaturesCarousel />
       </div>
 
       {/* Auth Modals */}
