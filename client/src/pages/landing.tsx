@@ -5,7 +5,6 @@ import AboutSection from "@/components/about-section";
 import HowItWorksSection from "@/components/how-it-works-section";
 import StatsSection from "@/components/home/stats-section";
 import RewardsSection from "@/components/rewards-section";
-import ContactSection from "@/components/contact-section";
 import { Helmet } from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,8 +86,7 @@ const Landing: React.FC<{
         {/* Rewards Section */}
         <RewardsSection />
         
-        {/* Contact Section */}
-        <ContactSection />
+        {/* Contact Section removed as requested */}
       </main>
         
       <Footer />

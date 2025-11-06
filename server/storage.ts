@@ -122,15 +122,18 @@ export class MemStorage implements IStorage {
 }
 
 // Import database storage
-import {
-  DatabaseStorage,
-  initializeAdminSecretCodes,
-} from "./database-storage";
+// Lazily choose storage backend depending on DATABASE_URL availability
+let chosenStorage: IStorage;
 
-// Use database storage instead of in-memory storage
-export const storage = new DatabaseStorage();
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== "") {
+  const { DatabaseStorage, initializeAdminSecretCodes } = await import("./database-storage");
+  chosenStorage = new DatabaseStorage();
+  initializeAdminSecretCodes().catch((err) => {
+    console.error("Failed to initialize admin secret codes:", err);
+  });
+} else {
+  console.warn("DATABASE_URL is not set. Falling back to in-memory storage. Data will not persist.");
+  chosenStorage = new MemStorage();
+}
 
-// Initialize admin secret codes in the database
-initializeAdminSecretCodes().catch((err) => {
-  console.error("Failed to initialize admin secret codes:", err);
-});
+export const storage = chosenStorage;

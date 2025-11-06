@@ -4,7 +4,9 @@ import Footer from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Play } from "lucide-react";
 
 const learningResources = [
   {
@@ -52,6 +54,14 @@ const learningResources = [
 ];
 
 const LearnPage: React.FC = () => {
+  const [open, setOpen] = React.useState(false);
+  const [active, setActive] = React.useState<typeof learningResources[number] | null>(null);
+
+  const openVideo = (res: typeof learningResources[number]) => {
+    setActive(res);
+    setOpen(true);
+  };
+
   return (
     <>
       <Helmet>
@@ -74,16 +84,19 @@ const LearnPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {learningResources.map((resource) => (
               <Card key={resource.id} className="overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div className="aspect-video">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${resource.youtubeId}`}
-                    title={resource.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                <div className="relative aspect-video bg-black/5">
+                  <img
+                    src={`https://img.youtube.com/vi/${resource.youtubeId}/hqdefault.jpg`}
+                    alt={resource.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/20" />
+                  <Button
+                    onClick={() => openVideo(resource)}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                  >
+                    <Play className="h-4 w-4 mr-2" /> Watch
+                  </Button>
                 </div>
                 <CardHeader>
                   <Badge variant="secondary" className="w-fit mb-2">{resource.category}</Badge>
@@ -95,6 +108,27 @@ const LearnPage: React.FC = () => {
               </Card>
             ))}
           </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="max-w-5xl">
+              <DialogHeader>
+                <DialogTitle>{active?.title}</DialogTitle>
+              </DialogHeader>
+              <div className="aspect-video">
+                {active && (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${active.youtubeId}?autoplay=1`}
+                    title={active.title}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{active?.description}</p>
+            </DialogContent>
+          </Dialog>
         </main>
         
         <Footer />
