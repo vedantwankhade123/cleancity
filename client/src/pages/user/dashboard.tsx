@@ -73,6 +73,7 @@ const UserDashboard: React.FC = () => {
               linkTo="/user/reports"
               iconColor="text-primary"
               iconBgColor="bg-primary/10"
+              className="h-full bg-gradient-to-br from-green-50 to-white"
             />
             
             <StatsCard
@@ -83,6 +84,7 @@ const UserDashboard: React.FC = () => {
               linkTo="/user/reports"
               iconColor="text-green-600"
               iconBgColor="bg-green-100"
+              className="h-full bg-gradient-to-br from-green-50 to-white"
             />
             
             <StatsCard
@@ -93,6 +95,7 @@ const UserDashboard: React.FC = () => {
               linkTo="/user/reports"
               iconColor="text-orange-600"
               iconBgColor="bg-orange-100"
+              className="h-full bg-gradient-to-br from-green-50 to-white"
             />
             
             <StatsCard
@@ -103,6 +106,7 @@ const UserDashboard: React.FC = () => {
               linkTo="/user/rewards"
               iconColor="text-accent"
               iconBgColor="bg-accent/10"
+              className="h-full bg-gradient-to-br from-green-50 to-white"
             />
           </div>
 

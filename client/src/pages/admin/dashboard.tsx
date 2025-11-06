@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Bookmark,
-  Calendar as CalendarIcon,
   Flag,
   MoreVertical,
   Clock,
@@ -24,10 +23,6 @@ import ReportStatusBadge from "@/components/report-status-badge";
 import { formatDate, timeAgo } from "@/lib/utils";
 import { Link } from "wouter";
 import { Helmet } from "react-helmet";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { DateRange, DayContent, type DayContentProps } from "react-day-picker";
-import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -42,10 +37,6 @@ const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [lastRead, setLastRead] = useState(new Date(0));
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(new Date().setDate(new Date().getDate() - 30)),
-    to: new Date(),
-  });
 
   useEffect(() => {
     if (user?.id) {
@@ -98,80 +89,16 @@ const AdminDashboard: React.FC = () => {
     queryClient.setQueryData(['notifications', user?.id], []);
   };
 
-  // Process reports to create a map of events by date
-  const reportEventsByDate = React.useMemo(() => {
-    if (!reports) return {};
-    
-    const events: Record<string, Set<string>> = {};
-
-    reports.forEach(report => {
-      // Submitted (blue)
-      const createdDate = format(new Date(report.createdAt), 'yyyy-MM-dd');
-      if (!events[createdDate]) events[createdDate] = new Set();
-      events[createdDate].add('submitted');
-
-      // Completed (green)
-      if (report.completedAt) {
-        const completedDate = format(new Date(report.completedAt), 'yyyy-MM-dd');
-        if (!events[completedDate]) events[completedDate] = new Set();
-        events[completedDate].add('completed');
-      }
-
-      // Processing (yellow) & Rejected (red)
-      if (report.status === 'processing' || report.status === 'rejected') {
-         const updatedDate = format(new Date(report.updatedAt), 'yyyy-MM-dd');
-         if (!events[updatedDate]) events[updatedDate] = new Set();
-         events[updatedDate].add(report.status);
-      }
-    });
-
-    return events;
-  }, [reports]);
-
-  // Custom DayContent component to render dots
-  function DayContentWithDots(props: DayContentProps) {
-    const dayString = format(props.date, 'yyyy-MM-dd');
-    const events = reportEventsByDate[dayString];
-
-    return (
-      <div className="relative h-full w-full flex items-center justify-center">
-        <DayContent {...props} />
-        {events && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex space-x-1">
-            {events.has('submitted') && <div className="h-1.5 w-1.5 rounded-full bg-blue-500" title="Report Submitted" />}
-            {events.has('processing') && <div className="h-1.5 w-1.5 rounded-full bg-yellow-500" title="Report Processing" />}
-            {events.has('rejected') && <div className="h-1.5 w-1.5 rounded-full bg-red-500" title="Report Rejected" />}
-            {events.has('completed') && <div className="h-1.5 w-1.5 rounded-full bg-green-500" title="Report Completed" />}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Filter reports based on selected date range
-  const filteredReports = React.useMemo(() => {
-    if (!reports) return [];
-    if (!date?.from) return reports;
-
-    const fromDate = date.from;
-    const toDate = date.to ? new Date(date.to.setHours(23, 59, 59, 999)) : new Date(new Date().setHours(23, 59, 59, 999));
-
-    return reports.filter(report => {
-      const reportDate = new Date(report.createdAt);
-      return reportDate >= fromDate && reportDate <= toDate;
-    });
-  }, [reports, date]);
-
-  // Count reports by status using filtered data
-  const getTotalReports = () => filteredReports?.length || 0;
+  // Count reports by status
+  const getTotalReports = () => reports?.length || 0;
   const getReportsByStatus = (status: string) => 
-    filteredReports?.filter(r => r.status === status).length || 0;
+    reports?.filter(r => r.status === status).length || 0;
 
-  // Recent activity data generation using filtered data
+  // Recent activity data generation
   const getRecentActivity = () => {
-    if (!filteredReports) return [];
+    if (!reports) return [];
     
-    const sortedReports = [...filteredReports].sort(
+    const sortedReports = [...reports].sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
     
@@ -217,40 +144,6 @@ const AdminDashboard: React.FC = () => {
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2 w-auto md:w-[240px] justify-start text-left font-normal">
-                        <CalendarIcon className="h-4 w-4" />
-                        <span className="hidden md:inline">
-                          {date?.from ? (
-                            date.to ? (
-                              <>
-                                {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
-                              </>
-                            ) : (
-                              format(date.from, "LLL dd, y")
-                            )
-                          ) : (
-                            "Pick a date"
-                          )}
-                        </span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="end">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={date?.from}
-                        selected={date}
-                        onSelect={setDate}
-                        numberOfMonths={1}
-                        components={{
-                          DayContent: DayContentWithDots,
-                        }}
-                      />
-                    </PopoverContent>
-                  </Popover>
-
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
@@ -314,45 +207,49 @@ const AdminDashboard: React.FC = () => {
                 title="Total Reports"
                 value={getTotalReports()}
                 icon={Flag}
-                description="All reports submitted in your city for the selected period."
+                description="All reports submitted in your city."
                 linkTo="/admin/reports"
                 iconColor="text-primary"
                 iconBgColor="bg-primary/10"
+                className="h-full bg-gradient-to-br from-green-50 to-white"
               />
               
               <StatsCard
                 title="Pending Review"
                 value={getReportsByStatus("pending")}
                 icon={Clock}
-                description="New reports that are awaiting your review and action."
+                description="New reports awaiting your review."
                 linkTo="/admin/reports"
                 iconColor="text-gray-600"
                 iconBgColor="bg-gray-100"
+                className="h-full bg-gradient-to-br from-green-50 to-white"
               />
               
               <StatsCard
                 title="In Progress"
                 value={getReportsByStatus("processing")}
                 icon={Loader2}
-                description="Reports that are currently being processed and worked on."
+                description="Reports currently being processed."
                 linkTo="/admin/reports"
                 iconColor="text-orange-600"
                 iconBgColor="bg-orange-100"
+                className="h-full bg-gradient-to-br from-green-50 to-white"
               />
               
               <StatsCard
                 title="Completed"
                 value={getReportsByStatus("completed")}
                 icon={CheckCircle}
-                description="Issues that have been successfully resolved and closed."
+                description="Issues that have been resolved."
                 linkTo="/admin/reports"
                 iconColor="text-green-600"
                 iconBgColor="bg-green-100"
+                className="h-full bg-gradient-to-br from-green-50 to-white"
               />
             </div>
 
             {/* Recent Reports */}
-            <div className="bg-white rounded-lg shadow mb-8">
+            <div className="bg-white rounded-lg shadow mb-8 bg-gradient-to-br from-green-50 to-white">
               <div className="flex items-center justify-between p-6 border-b">
                 <h3 className="text-xl font-bold">Recent Reports</h3>
                 <Link href="/admin/reports">
@@ -366,12 +263,12 @@ const AdminDashboard: React.FC = () => {
                   <div className="flex justify-center items-center py-12">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ) : !filteredReports || filteredReports.length === 0 ? (
+                ) : !reports || reports.length === 0 ? (
                   <div className="text-center py-12">
                     <Flag className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium">No reports in this period</h3>
+                    <h3 className="text-lg font-medium">No reports yet</h3>
                     <p className="text-gray-500 mt-2">
-                      Try selecting a different date range to see reports.
+                      New reports will appear here.
                     </p>
                   </div>
                 ) : (
@@ -389,7 +286,7 @@ const AdminDashboard: React.FC = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {filteredReports.slice(0, 4).map((report) => (
+                          {reports.slice(0, 4).map((report) => (
                             <tr key={report.id} className="hover:bg-gray-50">
                               <td className="px-6 py-4 whitespace-nowrap"><div className="flex items-center"><div className="flex-shrink-0 h-10 w-10 rounded bg-gray-200 overflow-hidden"><img src={report.imageUrl} alt={report.title} className="h-10 w-10 object-cover" /></div><div className="ml-4"><div className="text-sm font-medium text-gray-900">{report.title}</div><div className="text-sm text-gray-500">Reported by: User #{report.userId}</div></div></div></td>
                               <td className="px-6 py-4 whitespace-nowrap"><div className="text-sm text-gray-900">{report.address.split(",")[0]}</div></td>
@@ -403,7 +300,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     {/* Mobile Card List */}
                     <div className="space-y-4 md:hidden">
-                      {filteredReports.slice(0, 4).map((report) => (
+                      {reports.slice(0, 4).map((report) => (
                         <Card key={report.id} className="p-4">
                           <div className="flex items-start gap-4">
                             <img src={report.imageUrl} alt={report.title} className="h-16 w-16 object-cover rounded-md" />
@@ -431,7 +328,7 @@ const AdminDashboard: React.FC = () => {
             {/* User Management and Activity Timeline */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* User Management */}
-              <div className="lg:col-span-2 bg-white rounded-lg shadow">
+              <div className="lg:col-span-2 bg-white rounded-lg shadow h-full bg-gradient-to-br from-green-50 to-white">
                 <div className="flex items-center justify-between p-6 border-b">
                   <h3 className="text-xl font-bold">User Management</h3>
                   <Link href="/admin/users">
@@ -484,7 +381,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Activity Timeline */}
-              <div className="bg-white rounded-lg shadow">
+              <div className="bg-white rounded-lg shadow h-full bg-gradient-to-br from-green-50 to-white">
                 <div className="p-6 border-b">
                   <h3 className="text-xl font-bold">Recent Activity</h3>
                 </div>
