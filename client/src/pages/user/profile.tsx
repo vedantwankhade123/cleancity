@@ -159,35 +159,34 @@ const UserProfile: React.FC = () => {
         <Navbar />
         
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your profile, password, and account preferences.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="flex flex-col lg:flex-row lg:gap-10">
             {/* Left Sidebar Navigation */}
-            <aside className="lg:col-span-1">
-              <nav className="space-y-2">
-                {navLinks.map((link) => (
-                  <button
-                    key={link.id}
-                    onClick={() => setActiveTab(link.id)}
-                    className={cn(
-                      "w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                      activeTab === link.id
-                        ? "bg-primary/10 text-primary"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                    )}
-                  >
-                    <link.icon className="mr-3 h-5 w-5" />
-                    <span>{link.label}</span>
-                  </button>
-                ))}
-              </nav>
+            <aside className="lg:w-64 shrink-0">
+              <div className="lg:sticky top-24">
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">Account Settings</h1>
+                <p className="text-gray-600 mb-6">Manage your profile and security.</p>
+                <nav className="space-y-1">
+                  {navLinks.map((link) => (
+                    <button
+                      key={link.id}
+                      onClick={() => setActiveTab(link.id)}
+                      className={cn(
+                        "w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                        activeTab === link.id
+                          ? "bg-primary/10 text-primary"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      )}
+                    >
+                      <link.icon className="mr-3 h-5 w-5" />
+                      <span>{link.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
             </aside>
             
             {/* Right Content Area */}
-            <div className="lg:col-span-3">
+            <div className="flex-1 mt-8 lg:mt-0">
               {activeTab === 'profile' && (
                 <Card>
                   <CardHeader>
@@ -196,9 +195,9 @@ const UserProfile: React.FC = () => {
                   </CardHeader>
                   <Form {...profileForm}>
                     <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-                      <CardContent className="space-y-8">
+                      <CardContent className="divide-y divide-gray-200 p-0">
                         {/* Full Name */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Full Name</h3>
                             <p className="text-sm text-gray-500">Your public display name.</p>
@@ -208,10 +207,8 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
 
-                        <hr />
-
                         {/* Email */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Email</h3>
                             <p className="text-sm text-gray-500">Your email address cannot be changed.</p>
@@ -223,10 +220,8 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
 
-                        <hr />
-
                         {/* Phone */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Phone Number</h3>
                             <p className="text-sm text-gray-500">Your primary contact number.</p>
@@ -236,10 +231,8 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
 
-                        <hr />
-
                         {/* Address */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Address</h3>
                             <p className="text-sm text-gray-500">Your primary address.</p>
@@ -254,7 +247,7 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-end border-t pt-6">
+                      <CardFooter className="flex justify-end bg-gray-50 p-6">
                         <Button type="submit" disabled={!profileForm.formState.isDirty || profileUpdateMutation.isPending} className="gap-2">
                           {profileUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Saving...</>) : (<><Save className="h-4 w-4" />Save Changes</>)}
                         </Button>
@@ -272,8 +265,8 @@ const UserProfile: React.FC = () => {
                   </CardHeader>
                   <Form {...passwordForm}>
                     <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-                      <CardContent className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                      <CardContent className="divide-y divide-gray-200 p-0">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Current Password</h3>
                             <p className="text-sm text-gray-500">Enter your current password.</p>
@@ -283,9 +276,7 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
 
-                        <hr />
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">New Password</h3>
                             <p className="text-sm text-gray-500">Enter your new password.</p>
@@ -295,9 +286,7 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
 
-                        <hr />
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                           <div className="md:col-span-1">
                             <h3 className="font-medium">Confirm New Password</h3>
                             <p className="text-sm text-gray-500">Re-enter your new password.</p>
@@ -307,7 +296,7 @@ const UserProfile: React.FC = () => {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-end border-t pt-6">
+                      <CardFooter className="flex justify-end bg-gray-50 p-6">
                         <Button type="submit" variant="default" disabled={passwordUpdateMutation.isPending} className="gap-2">
                           {passwordUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Updating...</>) : (<><Check className="h-4 w-4" />Update Password</>)}
                         </Button>

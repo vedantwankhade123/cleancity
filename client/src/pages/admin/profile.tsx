@@ -181,14 +181,9 @@ const AdminProfile: React.FC = () => {
           </header>
 
           <main className="container px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Admin Account Settings</h2>
-              <p className="text-gray-600 mt-1">Manage your admin profile and security preferences.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              <aside className="lg:col-span-1">
-                <nav className="space-y-2">
+            <div className="flex flex-col lg:flex-row lg:gap-10">
+              <aside className="lg:w-64 shrink-0">
+                <nav className="space-y-1 sticky top-24">
                   {navLinks.map((link) => (
                     <button
                       key={link.id}
@@ -207,7 +202,7 @@ const AdminProfile: React.FC = () => {
                 </nav>
               </aside>
 
-              <div className="lg:col-span-3">
+              <div className="flex-1 mt-8 lg:mt-0">
                 {activeTab === 'profile' && (
                   <Card>
                     <CardHeader>
@@ -216,9 +211,9 @@ const AdminProfile: React.FC = () => {
                     </CardHeader>
                     <Form {...profileForm}>
                       <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-                        <CardContent className="space-y-8">
+                        <CardContent className="divide-y divide-gray-200 p-0">
                           {/* Full Name */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Full Name</h3>
                               <p className="text-sm text-gray-500">Your public display name.</p>
@@ -228,10 +223,8 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          <hr />
-
                           {/* Email */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Email</h3>
                               <p className="text-sm text-gray-500">Your email address cannot be changed.</p>
@@ -243,10 +236,8 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          <hr />
-
                           {/* Phone */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Phone Number</h3>
                               <p className="text-sm text-gray-500">Your primary contact number.</p>
@@ -256,10 +247,8 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          <hr />
-
                           {/* Address */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Address</h3>
                               <p className="text-sm text-gray-500">Your primary address.</p>
@@ -274,7 +263,7 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-end border-t pt-6">
+                        <CardFooter className="flex justify-end bg-gray-50 p-6">
                           <Button type="submit" disabled={!profileForm.formState.isDirty || profileUpdateMutation.isPending} className="gap-2">
                             {profileUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Saving...</>) : (<><Save className="h-4 w-4" />Save Changes</>)}
                           </Button>
@@ -292,8 +281,8 @@ const AdminProfile: React.FC = () => {
                     </CardHeader>
                     <Form {...passwordForm}>
                       <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-                        <CardContent className="space-y-8">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <CardContent className="divide-y divide-gray-200 p-0">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Current Password</h3>
                               <p className="text-sm text-gray-500">Enter your current password.</p>
@@ -303,9 +292,7 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          <hr />
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">New Password</h3>
                               <p className="text-sm text-gray-500">Enter your new password.</p>
@@ -315,9 +302,7 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
 
-                          <hr />
-
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-6">
                             <div className="md:col-span-1">
                               <h3 className="font-medium">Confirm New Password</h3>
                               <p className="text-sm text-gray-500">Re-enter your new password.</p>
@@ -327,7 +312,7 @@ const AdminProfile: React.FC = () => {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-end border-t pt-6">
+                        <CardFooter className="flex justify-end bg-gray-50 p-6">
                           <Button type="submit" variant="default" disabled={passwordUpdateMutation.isPending} className="gap-2">
                             {passwordUpdateMutation.isPending ? (<><Loader2 className="h-4 w-4 animate-spin" />Updating...</>) : (<><Check className="h-4 w-4" />Update Password</>)}
                           </Button>
