@@ -26,7 +26,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   className,
 }) => {
   const cardContent = (
-    <Card className={cn("group transition-all duration-300 hover:shadow-lg hover:border-primary/30", className)}>
+    <Card className={cn("group transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-1", className)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className={cn(

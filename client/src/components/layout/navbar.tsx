@@ -185,7 +185,7 @@ const Navbar: React.FC<NavbarProps> = ({
     }
     
     return cn(
-      "transition-colors duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100",
+      "transition-all duration-200 px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 hover:scale-105",
       isActive && "bg-primary text-white hover:bg-primary/90"
     );
   };
@@ -227,7 +227,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 <div className="flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
+                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110">
                         <Bell className="h-5 w-5" />
                         {hasUnread && (
                           <span className="absolute top-1.5 right-1.5 bg-accent text-white rounded-full w-2 h-2" />

@@ -31,7 +31,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, isAdmin = false, onUpda
   
   return (
     <>
-      <Card className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+      <Card className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
         <CardContent className="p-0">
           <div className="p-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -146,7 +146,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-gray-100">
+                      <Button variant="ghost" size="icon" className="relative text-gray-700 hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-110">
                         <Bell className="h-5 w-5" />
                         {hasUnread && (
                           <span className="absolute top-1.5 right-1.5 bg-red-500 text-white rounded-full w-2 h-2" />
