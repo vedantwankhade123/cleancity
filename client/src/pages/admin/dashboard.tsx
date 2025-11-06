@@ -211,7 +211,7 @@ const AdminDashboard: React.FC = () => {
                 linkTo="/admin/reports"
                 iconColor="text-primary"
                 iconBgColor="bg-primary/10"
-                className="h-full bg-gradient-to-br from-green-50 to-white"
+                className="h-full bg-white"
               />
               
               <StatsCard
@@ -222,7 +222,7 @@ const AdminDashboard: React.FC = () => {
                 linkTo="/admin/reports"
                 iconColor="text-gray-600"
                 iconBgColor="bg-gray-100"
-                className="h-full bg-gradient-to-br from-green-50 to-white"
+                className="h-full bg-white"
               />
               
               <StatsCard
@@ -233,7 +233,7 @@ const AdminDashboard: React.FC = () => {
                 linkTo="/admin/reports"
                 iconColor="text-orange-600"
                 iconBgColor="bg-orange-100"
-                className="h-full bg-gradient-to-br from-green-50 to-white"
+                className="h-full bg-white"
               />
               
               <StatsCard
@@ -244,12 +244,12 @@ const AdminDashboard: React.FC = () => {
                 linkTo="/admin/reports"
                 iconColor="text-green-600"
                 iconBgColor="bg-green-100"
-                className="h-full bg-gradient-to-br from-green-50 to-white"
+                className="h-full bg-white"
               />
             </div>
 
             {/* Recent Reports */}
-            <div className="bg-white rounded-lg shadow mb-8 bg-gradient-to-br from-green-50 to-white">
+            <div className="bg-white rounded-lg shadow mb-8">
               <div className="flex items-center justify-between p-6 border-b">
                 <h3 className="text-xl font-bold">Recent Reports</h3>
                 <Link href="/admin/reports">
@@ -328,7 +328,7 @@ const AdminDashboard: React.FC = () => {
             {/* User Management and Activity Timeline */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* User Management */}
-              <div className="lg:col-span-2 bg-white rounded-lg shadow h-full bg-gradient-to-br from-green-50 to-white">
+              <div className="lg:col-span-2 bg-white rounded-lg shadow h-full">
                 <div className="flex items-center justify-between p-6 border-b">
                   <h3 className="text-xl font-bold">User Management</h3>
                   <Link href="/admin/users">
@@ -381,7 +381,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Activity Timeline */}
-              <div className="bg-white rounded-lg shadow h-full bg-gradient-to-br from-green-50 to-white">
+              <div className="bg-white rounded-lg shadow h-full">
                 <div className="p-6 border-b">
                   <h3 className="text-xl font-bold">Recent Activity</h3>
                 </div>
