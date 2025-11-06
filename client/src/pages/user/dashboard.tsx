@@ -12,6 +12,53 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+const learningResources = [
+  {
+    id: 1,
+    title: "The Journey of Your Recyclables",
+    description: "Ever wonder what happens to your plastic bottles and paper after you put them in the recycling bin? This video follows the journey.",
+    youtubeId: "s4LZw8wWfBU",
+    category: "Recycling"
+  },
+  {
+    id: 2,
+    title: "Composting for Beginners: A Step-by-Step Guide",
+    description: "Learn how to turn your kitchen scraps into nutrient-rich soil for your garden. It's easier than you think!",
+    youtubeId: "V8miLevRI_o",
+    category: "Composting"
+  },
+  {
+    id: 3,
+    title: "Understanding E-Waste: The Hidden Dangers",
+    description: "Electronic waste is a growing problem. Find out why it's so hazardous and how to dispose of it responsibly.",
+    youtubeId: "g49_a2FkDi8",
+    category: "E-Waste"
+  },
+  {
+    id: 4,
+    title: "Zero Waste Lifestyle: 10 Simple Swaps",
+    description: "Discover 10 easy changes you can make in your daily life to significantly reduce your waste and environmental impact.",
+    youtubeId: "OagTXWfa6kM",
+    category: "Lifestyle"
+  },
+  {
+    id: 5,
+    title: "The Problem with Plastic Pollution",
+    description: "A deep dive into the global plastic crisis, its effects on our oceans and wildlife, and what we can do to combat it.",
+    youtubeId: "1RDc2opwg0I",
+    category: "Plastic Waste"
+  },
+  {
+    id: 6,
+    title: "How to Read Recycling Symbols",
+    description: "Demystify the numbers and symbols on plastic containers to become a more effective and accurate recycler.",
+    youtubeId: "J_MB84G_HqA",
+    category: "Recycling"
+  }
+];
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -116,6 +163,7 @@ const UserDashboard: React.FC = () => {
               <TabsList>
                 <TabsTrigger value="reports">My Reports</TabsTrigger>
                 <TabsTrigger value="rewards">Rewards</TabsTrigger>
+                <TabsTrigger value="learn">Learn</TabsTrigger>
               </TabsList>
               
               <div className="flex w-full sm:w-auto items-center gap-4">
@@ -232,6 +280,33 @@ const UserDashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="learn">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {learningResources.map((resource) => (
+                  <Card key={resource.id} className="overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div className="aspect-video">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={`https://www.youtube.com/embed/${resource.youtubeId}`}
+                        title={resource.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                    <CardHeader>
+                      <Badge variant="secondary" className="w-fit mb-2">{resource.category}</Badge>
+                      <CardTitle>{resource.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <CardDescription>{resource.description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </TabsContent>
           </Tabs>
