@@ -195,9 +195,18 @@ const Navbar: React.FC<NavbarProps> = ({
       <header className={navbarClass}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold transition-transform hover:scale-105 z-10">
-              <span className="text-primary">Clean</span>
-              <span className="text-secondary">City</span>
+            <Link href="/" className="transition-transform hover:scale-105 z-10">
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-bold">
+                  <span className="text-primary">Clean</span>
+                  <span className="text-secondary">City</span>
+                </span>
+                {isAuthenticated && user?.city && (
+                  <span className="text-sm font-semibold text-gray-500 border-l-2 border-gray-300 pl-3">
+                    {user.city}
+                  </span>
+                )}
+              </div>
             </Link>
 
             {/* Centered Navigation */}
@@ -293,7 +302,19 @@ const Navbar: React.FC<NavbarProps> = ({
             >
               <div className="p-6 flex flex-col h-full">
                 <div className="flex justify-between items-center mb-8">
-                  <Link href="/" className="text-primary text-2xl font-bold" onClick={toggleMenu}>Clean<span className="text-secondary">City</span></Link>
+                  <Link href="/" onClick={toggleMenu}>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-2xl font-bold">
+                        <span className="text-primary">Clean</span>
+                        <span className="text-secondary">City</span>
+                      </span>
+                      {isAuthenticated && user?.city && (
+                        <span className="text-sm font-semibold text-gray-500 border-l-2 border-gray-300 pl-3">
+                          {user.city}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
                   <Button variant="ghost" size="icon" onClick={toggleMenu}><X className="h-6 w-6 text-gray-700" /></Button>
                 </div>
                 <nav className="flex flex-col space-y-2 text-lg font-medium">
